@@ -1,0 +1,23 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { saveUpload } from "@/lib/upload";
+import { extractReceipt } from "@/lib/ocr";
+
+export async function POST(req: NextRequest) {
+  const session = await getSession();
+  if (!session.userId) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const formData = await req.formData();
+  const photo = formData.get("photo") as File;
+
+  if (!photo) {
+    return NextResponse.json({ error: "Photo required" }, { status: 400 });
+  }
+
+  const filePath = await saveUpload(photo, "receipts");
+  const result = await extractReceipt(filePath);
+
+  return NextResponse.json({ ...result, filePath });
+}

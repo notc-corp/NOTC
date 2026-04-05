@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notary & Tax Services | Professional Tax Preparation & Notary Public in New Orleans</title>
+    <meta name="description" content="Trusted notary public and tax preparation services in New Orleans. IRS Authorized E-File Provider. Individual, self-employed, and small business tax returns. Mobile notary available.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <style>
+        /* ========== RESET & VARIABLES ========== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green: #2D6A4F;
+            --green-dark: #1B4332;
+            --green-light: #3E8E6A;
+            --green-wash: #f0f7f4;
+            --grey: #D1D5DB;
+            --grey-light: #F3F4F6;
+            --grey-mid: #9CA3AF;
+            --dark: #1F2937;
+            --body: #4B5563;
+            --white: #FFFFFF;
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+            --radius: 8px;
+            --radius-lg: 16px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--body);
+            background: var(--white);
+            line-height: 1.7;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            color: var(--dark);
+            line-height: 1.2;
+            font-weight: 600;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        img { max-width: 100%; display: block; }
+        button { cursor: pointer; font-family: var(--font-body); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ========== UTILITY ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            transition: var(--transition);
+            border: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background: var(--green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 106, 79, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--green);
+            border: 2px solid var(--green);
+        }
+        .btn-outline:hover {
+            background: var(--green);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-white {
+            background: var(--white);
+            color: var(--green);
+        }
+        .btn-white:hover {
+            background: var(--grey-light);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-label {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--green);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-label::before {
+            content: '';
+            width: 28px;
+            height: 2px;
+            background: var(--green);
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--body);
+            max-width: 600px;
+            line-height: 1.7;
+        }
+
+        .section-header {
+            margin-bottom: 56px;
+        }
+
+        section {
+            padding: 100px 0;
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .header.scrolled {
+            border-bottom-color: var(--grey);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 76px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .logo-icon svg { width: 22px; height: 22px; }
+        .logo-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--dark);
+            line-height: 1.15;
+        }
+        .logo-text span {
+            display: block;
+            font-size: 0.65rem;
+            font-family: var(--font-body);
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--green);
+        }
+
+        .nav { display: flex; align-items: center; gap: 8px; }
+        .nav a {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--body);
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+        .nav a:hover { color: var(--green); background: var(--green-wash); }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-phone {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        .header-phone svg { width: 16px; height: 16px; color: var(--green); }
+
+        .header-cta {
+            padding: 10px 24px;
+            font-size: 0.875rem;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+        }
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--dark);
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 76px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white);
+            z-index: 999;
+            padding: 32px 24px;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+        .mobile-nav.active { display: flex; }
+        .mobile-nav a {
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--dark);
+            border-bottom: 1px solid var(--grey-light);
+            transition: var(--transition);
+        }
+        .mobile-nav a:hover { color: var(--green); }
+        .mobile-nav .btn { margin-top: 16px; justify-content: center; }
+
+        /* ========== HERO ========== */
+        .hero {
+            padding: 140px 0 100px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(165deg, var(--white) 0%, var(--green-wash) 50%, var(--white) 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(45,106,79,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(45,106,79,0.04) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            border: 1px solid var(--grey);
+            border-radius: 100px;
+            padding: 6px 16px 6px 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--green);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.75rem);
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
+        .hero h1 em {
+            font-style: italic;
+            color: var(--green);
+        }
+
+        .hero-desc {
+            font-size: 1.125rem;
+            color: var(--body);
+            margin-bottom: 36px;
+            max-width: 520px;
+            line-height: 1.75;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .trust-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--grey);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .trust-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--green-wash);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .trust-icon svg { width: 20px; height: 20px; color: var(--green); }
+
+        .trust-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+        }
+        .hero-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+            border: 1px solid var(--grey);
+            position: relative;
+        }
+        .hero-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--grey-light);
+        }
+        .hero-card-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-card-avatar svg { width: 24px; height: 24px; color: var(--white); }
+        .hero-card-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+        .hero-card-label {
+            font-size: 0.8rem;
+            color: var(--grey-mid);
+        }
+
+        .hero-card-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .hero-stat {
+            background: var(--green-wash);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+        .hero-stat-value {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--green);
+        }
+        .hero-stat-label {
+            font-size: 0.8rem;
+            color: var(--body);
+            margin-top: 4px;
+        }
+
+        .hero-floating-badge {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            background: var(--green);
+            color: var(--white);
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        .hero-floating-badge svg { width: 20px; height: 20px; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ========== SERVICES ========== */
+        .services { background: var(--white); }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .service-card {
+            padding: 36px 32px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--grey);
+            background: var(--white);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--green);
+            transform: scaleX(0);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left;
+        }
+        .service-card:hover {
+            border-color: var(--green);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+        .service-card:hover::before { transform: scaleX(1); }
+
+        .service-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--green-wash);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        .service-card:hover .service-icon { background: var(--green); }
+        .service-icon svg {
+            width: 28px;
+            height: 28px;
+            color: var(--green);
+            transition: var(--transition);
+        }
+        .service-card:hover .service-icon svg { color: var(--white); }
+
+        .service-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 12px;
+        }
+        .service-card p {
+            font-size: 0.925rem;
+            line-height: 1.65;
+            color: var(--body);
+        }
+
+        .service-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 16px;
+        }
+        .service-tag {
+            padding: 4px 12px;
+            background: var(--grey-light);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--body);
+            transition: var(--transition);
+        }
+        .service-card:hover .service-tag {
+            background: var(--green-wash);
+            color: var(--green);
+        }
+
+        /* ========== WHY CHOOSE US ========== */
+        .why { background: var(--green-wash); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 64px;
+        }
+
+        .stat-tile {
+            text-align: center;
+            padding: 36px 24px;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--grey);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .stat-tile:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--green);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--body);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 24px;
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--grey);
+            transition: var(--transition);
+        }
+        .feature-item:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--green);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--green);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .feature-icon svg { width: 22px; height: 22px; color: var(--white); }
+        .feature-item h4 {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .feature-item p {
+            font-size: 0.85rem;
+            color: var(--grey-mid);
+            line-height: 1.5;
+        }
+
+        /* ========== PRICING ========== */
+        .pricing { background: var(--white); }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .pricing-card {
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--grey);
+            background: var(--white);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .pricing-card:hover {
+            border-color: var(--green);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-6px);
+        }
+        .pricing-card.featured {
+            border-color: var(--green);
+            position: relative;
+        }
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--green);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .pricing-card-body {
+            padding: 36px 28px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+        .pricing-card .price {
+            font-family: var(--font-display);
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--green);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .pricing-card .price-note {
+            font-size: 0.8rem;
+            color: var(--grey-mid);
+            margin-bottom: 24px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 28px;
+            flex: 1;
+        }
+        .pricing-features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.9rem;
+            color: var(--body);
+        }
+        .pricing-features li svg {
+            width: 18px;
+            height: 18px;
+            color: var(--green);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .pricing-card .btn { width: 100%; justify-content: center; }
+
+        /* ========== TESTIMONIALS ========== */
+        .testimonials {
+            background: var(--green-wash);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px;
+            border: 1px solid var(--grey);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+        }
+        .testimonial-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .testimonial-stars {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 20px;
+        }
+        .testimonial-stars svg { width: 18px; height: 18px; color: #F59E0B; }
+
+        .testimonial-quote {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--dark);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .testimonial-quote::before {
+            content: '\201C';
+            font-size: 3rem;
+            color: var(--green);
+            line-height: 0;
+            position: relative;
+            top: 16px;
+            margin-right: 4px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--grey-light);
+        }
+        .testimonial-avatar {
+            width: 44px;
+            height: 44px;
+            background: var(--green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .testimonial-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        .testimonial-role {
+            font-size: 0.8rem;
+            color: var(--grey-mid);
+        }
+
+        /* ========== FAQ ========== */
+        .faq { background: var(--white); }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            border: 1px solid var(--grey);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .faq-item:hover { border-color: var(--green); }
+        .faq-item.active { border-color: var(--green); }
+
+        .faq-question {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 24px;
+            background: none;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark);
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-body);
+        }
+        .faq-question:hover { color: var(--green); }
+        .faq-question svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            color: var(--green);
+        }
+        .faq-item.active .faq-question svg { transform: rotate(45deg); }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+        }
+        .faq-answer-inner {
+            padding: 0 24px 20px;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--body);
+        }
+
+        /* ========== DEADLINE BANNER ========== */
+        .deadline-banner {
+            background: var(--green);
+            padding: 48px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .deadline-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                135deg,
+                transparent,
+                transparent 20px,
+                rgba(255,255,255,0.02) 20px,
+                rgba(255,255,255,0.02) 40px
+            );
+        }
+
+        .deadline-label {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 12px;
+        }
+
+        .deadline-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            color: var(--white);
+            margin-bottom: 24px;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .countdown-item {
+            text-align: center;
+        }
+        .countdown-value {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1;
+            min-width: 70px;
+            display: block;
+        }
+        .countdown-unit {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.6);
+            margin-top: 6px;
+        }
+        .countdown-sep {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: rgba(255,255,255,0.3);
+            line-height: 1;
+            align-self: flex-start;
+        }
+
+        /* ========== CONTACT ========== */
+        .contact { background: var(--green-wash); }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .contact-form {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            border: 1px solid var(--grey);
+            box-shadow: var(--shadow-sm);
+        }
+        .contact-form h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .contact-form > p {
+            color: var(--body);
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--grey);
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--dark);
+            transition: var(--transition);
+            background: var(--white);
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .contact-info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .contact-info-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            border: 1px solid var(--grey);
+            box-shadow: var(--shadow-sm);
+        }
+        .contact-info-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 12px 0;
+        }
+        .info-item:not(:last-child) { border-bottom: 1px solid var(--grey-light); }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--green-wash);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .info-icon svg { width: 18px; height: 18px; color: var(--green); }
+        .info-label {
+            font-size: 0.8rem;
+            color: var(--grey-mid);
+            font-weight: 500;
+        }
+        .info-value {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        .info-value a { color: var(--green); }
+        .info-value a:hover { text-decoration: underline; }
+
+        .contact-map {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--grey);
+            flex: 1;
+            min-height: 220px;
+        }
+        .contact-map iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 220px;
+            border: 0;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: var(--dark);
+            color: rgba(255,255,255,0.7);
+            padding: 64px 0 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            padding-bottom: 48px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+        .footer-brand .logo { margin-bottom: 16px; }
+        .footer-brand .logo-text { color: var(--white); }
+        .footer-brand .logo-text span { color: rgba(255,255,255,0.5); }
+        .footer-brand p {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .footer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+        }
+        .footer-badge svg { width: 16px; height: 16px; color: var(--green-light); }
+
+        .footer-col h4 {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--white);
+            margin-bottom: 20px;
+        }
+        .footer-col a {
+            display: block;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            transition: var(--transition);
+        }
+        .footer-col a:hover { color: var(--white); transform: translateX(4px); }
+
+        .footer-social {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .footer-social a {
+            width: 38px;
+            height: 38px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: var(--transition);
+        }
+        .footer-social a:hover {
+            background: var(--green);
+            border-color: var(--green);
+            transform: translateY(-2px) translateX(0);
+        }
+        .footer-social svg { width: 16px; height: 16px; color: rgba(255,255,255,0.7); }
+
+        .footer-bottom {
+            padding: 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+        }
+        .footer-bottom a { color: rgba(255,255,255,0.5); }
+        .footer-bottom a:hover { color: var(--white); }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .hero-inner { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .trust-row { grid-template-columns: repeat(2, 1fr); }
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+        }
+
+        @media (max-width: 768px) {
+            section { padding: 72px 0; }
+
+            .nav, .header-phone { display: none; }
+            .hamburger { display: flex; }
+
+            .hero { padding: 110px 0 72px; }
+            .hero h1 { font-size: 2.25rem; }
+            .trust-row { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .trust-item { padding: 12px; }
+
+            .services-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .features-grid { grid-template-columns: 1fr; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .testimonials-grid { grid-template-columns: 1fr; }
+            .faq-grid { grid-template-columns: 1fr; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+            .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+            .form-row { grid-template-columns: 1fr; }
+            .countdown { gap: 12px; }
+            .hero-ctas .btn { width: 100%; justify-content: center; }
+        }
+
+        @media (max-width: 480px) {
+            .trust-row { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ====== HEADER ====== -->
+    <header class="header" id="header">
+        <div class="container header-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <div class="logo-text">
+                    Notary & Tax
+                    <span>Services</span>
+                </div>
+            </a>
+
+            <nav class="nav">
+                <a href="#services">Services</a>
+                <a href="#why">About</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+                <a href="#contact">Contact</a>
+            </nav>
+
+            <div class="header-right">
+                <a href="tel:5045840377" class="header-phone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    (504) 584-0377
+                </a>
+                <a href="#contact" class="btn btn-primary header-cta">Book Appointment</a>
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="#services" class="mobile-link">Services</a>
+        <a href="#why" class="mobile-link">About</a>
+        <a href="#pricing" class="mobile-link">Pricing</a>
+        <a href="#faq" class="mobile-link">FAQ</a>
+        <a href="#contact" class="mobile-link">Contact</a>
+        <a href="tel:5045840377" class="mobile-link">Call (504) 584-0377</a>
+        <a href="#contact" class="btn btn-primary">Book Appointment</a>
+    </div>
+
+    <!-- ====== HERO ====== -->
+    <section class="hero" id="home">
+        <div class="container hero-inner">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    IRS Authorized E-File Provider
+                </div>
+                <h1>Trusted Notary &amp; Tax Services in <em>New Orleans</em></h1>
+                <p class="hero-desc">Professional tax preparation, notary public services, and business solutions for individuals and small businesses. Accurate, affordable, and always in your corner.</p>
+                <div class="hero-ctas">
+                    <a href="#contact" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Book Appointment
+                    </a>
+                    <a href="tel:5045840377" class="btn btn-outline">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Call Now
+                    </a>
+                </div>
+                <div class="trust-row">
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <div class="trust-text">IRS Authorized<br>E-File Provider</div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                        </div>
+                        <div class="trust-text">5+ Years<br>Experience</div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </div>
+                        <div class="trust-text">1,000+ Returns<br>Filed</div>
+                    </div>
+                    <div class="trust-item">
+                        <div class="trust-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <div class="trust-text">5-Star<br>Rated</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== SERVICES ====== -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header reveal">
+                <div class="section-label">What We Offer</div>
+                <h2 class="section-title">Comprehensive Tax &amp; Notary Services</h2>
+                <p class="section-subtitle">From individual tax returns to business formation, we provide everything you need under one roof.</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3>Tax Preparation</h3>
+                    <p>Accurate and affordable tax preparation for individuals and families. We maximize your refund and ensure full compliance.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">W-2</span>
+                        <span class="service-tag">1099</span>
+                        <span class="service-tag">Self-Employed</span>
+                        <span class="service-tag">Small Business</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3 3 3-3"/></svg>
+                    </div>
+                    <h3>Notary Public Services</h3>
+                    <p>Certified notary public services including mobile notary. We come to you for signatures, affidavits, and document authentication.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Mobile Notary</span>
+                        <span class="service-tag">POA</span>
+                        <span class="service-tag">Affidavits</span>
+                        <span class="service-tag">Loan Signings</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    </div>
+                    <h3>Business Services</h3>
+                    <p>Start and grow your business with our formation services. We handle the paperwork so you can focus on what matters.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">LLC Formation</span>
+                        <span class="service-tag">EIN Applications</span>
+                        <span class="service-tag">Operating Agreements</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h3>ITIN Applications</h3>
+                    <p>We assist with Individual Taxpayer Identification Number applications and renewals, helping you meet your tax obligations.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">New Applications</span>
+                        <span class="service-tag">Renewals</span>
+                        <span class="service-tag">CAA Certified</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="6" x2="12" y2="13"/><line x1="9" y1="10" x2="15" y2="10"/></svg>
+                    </div>
+                    <h3>Bookkeeping</h3>
+                    <p>Keep your finances organized with professional bookkeeping services. Monthly or quarterly packages tailored to your needs.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Monthly</span>
+                        <span class="service-tag">Quarterly</span>
+                        <span class="service-tag">QuickBooks Setup</span>
+                    </div>
+                </div>
+                <div class="service-card reveal">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    </div>
+                    <h3>Sales Tax Filing</h3>
+                    <p>Stay compliant with Louisiana sales tax requirements. We handle your filings accurately and on time, every period.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Louisiana Sales Tax</span>
+                        <span class="service-tag">Compliance</span>
+                        <span class="service-tag">On-Time Filing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== WHY CHOOSE US ====== -->
+    <section class="why" id="why">
+        <div class="container">
+            <div class="section-header reveal" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+                <div class="section-label" style="justify-content:center;">Why Choose Us</div>
+                <h2 class="section-title">Your Trusted Partner in<br>Tax &amp; Notary Services</h2>
+                <p class="section-subtitle" style="text-align:center;">We combine years of professional experience with a commitment to accuracy, affordability, and personalized service.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-tile reveal">
+                    <div class="stat-number" data-target="5">0</div>
+                    <div class="stat-label">Years of Experience</div>
+                </div>
+                <div class="stat-tile reveal">
+                    <div class="stat-number" data-target="1000">0</div>
+                    <div class="stat-label">Returns Filed</div>
+                </div>
+                <div class="stat-tile reveal">
+                    <div class="stat-number" data-target="99">0</div>
+                    <div class="stat-label">Accuracy Rate</div>
+                </div>
+                <div class="stat-tile reveal">
+                    <div class="stat-number">Same-Day</div>
+                    <div class="stat-label">Service Available</div>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-item reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div>
+                        <h4>IRS Authorized</h4>
+                        <p>Certified E-File provider with full IRS authorization</p>
+                    </div>
+                </div>
+                <div class="feature-item reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div>
+                        <h4>Maximum Refund Guarantee</h4>
+                        <p>We find every deduction and credit you deserve</p>
+                    </div>
+                </div>
+                <div class="feature-item reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <div>
+                        <h4>Bilingual Services</h4>
+                        <p>We proudly serve our community in English and Spanish</p>
+                    </div>
+                </div>
+                <div class="feature-item reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div>
+                        <h4>Transparent Pricing</h4>
+                        <p>No hidden fees — you know the cost before we start</p>
+                    </div>
+                </div>
+                <div class="feature-item reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </div>
+                    <div>
+                        <h4>Audit Support</h4>
+                        <p>We stand behind our work with full audit assistance</p>
+                    </div>
+                </div>
+                <div class="feature-item reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div>
+                        <h4>Secure &amp; Confidential</h4>
+                        <p>Your personal information is always protected</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== PRICING ====== -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header reveal" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+                <div class="section-label" style="justify-content:center;">Pricing</div>
+                <h2 class="section-title">Affordable, Transparent Pricing</h2>
+                <p class="section-subtitle" style="text-align:center;">No surprises, no hidden fees. You'll know the cost before we begin.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card reveal">
+                    <div class="pricing-card-body">
+                        <h3>Individual Tax Return</h3>
+                        <div class="price">$150</div>
+                        <div class="price-note">Starting price</div>
+                        <ul class="pricing-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                W-2 &amp; 1099 income
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Standard deductions
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                E-file included
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Refund maximization
+                            </li>
+                        </ul>
+                        <a href="#contact" class="btn btn-outline">Book Now</a>
+                    </div>
+                </div>
+
+                <div class="pricing-card featured reveal">
+                    <div class="pricing-card-body">
+                        <h3>Self-Employed Return</h3>
+                        <div class="price">$200</div>
+                        <div class="price-note">Starting price</div>
+                        <ul class="pricing-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                1099 &amp; freelance income
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Business expense deductions
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Schedule C preparation
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Quarterly estimate guidance
+                            </li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary">Book Now</a>
+                    </div>
+                </div>
+
+                <div class="pricing-card reveal">
+                    <div class="pricing-card-body">
+                        <h3>Small Business Return</h3>
+                        <div class="price">$300</div>
+                        <div class="price-note">Starting price</div>
+                        <ul class="pricing-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                LLC &amp; S-Corp returns
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Business deductions
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Payroll reporting
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Year-round support
+                            </li>
+                        </ul>
+                        <a href="#contact" class="btn btn-outline">Book Now</a>
+                    </div>
+                </div>
+
+                <div class="pricing-card reveal">
+                    <div class="pricing-card-body">
+                        <h3>Notary Services</h3>
+                        <div class="price">$10</div>
+                        <div class="price-note">Per signature</div>
+                        <ul class="pricing-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Mobile notary available
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                POA &amp; affidavits
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Same-day appointments
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Real estate closings
+                            </li>
+                        </ul>
+                        <a href="#contact" class="btn btn-outline">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== TESTIMONIALS ====== -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header reveal" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+                <div class="section-label" style="justify-content:center;">Testimonials</div>
+                <h2 class="section-title">What Our Clients Say</h2>
+                <p class="section-subtitle" style="text-align:center;">Join hundreds of satisfied clients across New Orleans who trust us with their taxes and documents.</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <p class="testimonial-quote">They made filing my taxes so easy! Professional, affordable, and they found deductions I didn't even know about.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MG</div>
+                        <div>
+                            <div class="testimonial-name">Maria G.</div>
+                            <div class="testimonial-role">Individual Tax Client</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <p class="testimonial-quote">Best notary service in New Orleans. Fast, reliable, and incredibly friendly. They even came to my office for a signing!</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JT</div>
+                        <div>
+                            <div class="testimonial-name">James T.</div>
+                            <div class="testimonial-role">Notary Client</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <p class="testimonial-quote">I've been coming here for 3 years now. They always maximize my refund and explain everything clearly. Highly recommend!</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">KW</div>
+                        <div>
+                            <div class="testimonial-name">Keisha W.</div>
+                            <div class="testimonial-role">Returning Tax Client</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== FAQ ====== -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <div class="section-header reveal" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+                <div class="section-label" style="justify-content:center;">FAQ</div>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtitle" style="text-align:center;">Everything you need to know before your visit. Can't find your answer? Give us a call.</p>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        What documents do I need for tax preparation?
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">Bring your government-issued photo ID, Social Security cards for you and all dependents, all W-2s and 1099 forms, last year's tax return (if available), and any receipts for deductible expenses. For self-employed clients, also bring records of business income and expenses.</div>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        Do you offer mobile notary services?
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">Yes! We offer mobile notary services throughout the New Orleans metropolitan area. We can come to your home, office, hospital, or any convenient location. Travel fees may apply depending on distance. Call us to schedule a mobile appointment.</div>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        How long does tax preparation take?
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">Most individual returns are completed within the same day. More complex returns such as self-employed or business returns may take 1-3 business days. We also offer drop-off service — leave your documents with us and we'll call you when your return is ready.</div>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        Do you speak Spanish?
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">Yes, we proudly offer bilingual services in both English and Spanish. Our team is ready to assist you in the language you're most comfortable with. No appointment needed for walk-ins.</div>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        What forms of payment do you accept?
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">We accept cash, all major credit and debit cards, Zelle, and CashApp. For tax preparation, we also offer the option to deduct your preparation fees directly from your refund — so you can file with no upfront cost.</div>
+                    </div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        Can I get my fees deducted from my refund?
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">Absolutely! We offer a pay-from-refund option that lets you have your tax preparation fees deducted directly from your refund. This means there is no out-of-pocket cost at the time of filing. A small processing fee applies.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== TAX DEADLINE BANNER ====== -->
+    <div class="deadline-banner">
+        <div class="container" style="position:relative; z-index:1;">
+            <div class="deadline-label">Tax Season Countdown</div>
+            <h2 class="deadline-title">Don't Wait — The Filing Deadline Is Approaching</h2>
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <span class="countdown-value" id="cd-days">--</span>
+                    <div class="countdown-unit">Days</div>
+                </div>
+                <span class="countdown-sep">:</span>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="cd-hours">--</span>
+                    <div class="countdown-unit">Hours</div>
+                </div>
+                <span class="countdown-sep">:</span>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="cd-mins">--</span>
+                    <div class="countdown-unit">Minutes</div>
+                </div>
+                <span class="countdown-sep">:</span>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="cd-secs">--</span>
+                    <div class="countdown-unit">Seconds</div>
+                </div>
+            </div>
+            <a href="#contact" class="btn btn-white">Book Your Appointment Today</a>
+        </div>
+    </div>
+
+    <!-- ====== CONTACT ====== -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header reveal" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+                <div class="section-label" style="justify-content:center;">Get In Touch</div>
+                <h2 class="section-title">Schedule Your Appointment</h2>
+                <p class="section-subtitle" style="text-align:center;">Walk-ins are always welcome, or book ahead to guarantee your preferred time.</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-form reveal">
+                    <h3>Send Us a Message</h3>
+                    <p>Fill out the form below and we'll get back to you within 24 hours.</p>
+                    <form id="contactForm" onsubmit="handleSubmit(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" name="name" placeholder="Your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" placeholder="(504) 000-0000" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service">Service Needed</label>
+                            <select id="service" name="service" required>
+                                <option value="" disabled selected>Select a service</option>
+                                <option value="individual-tax">Individual Tax Return</option>
+                                <option value="self-employed-tax">Self-Employed Tax Return</option>
+                                <option value="business-tax">Small Business Tax Return</option>
+                                <option value="notary">Notary Services</option>
+                                <option value="mobile-notary">Mobile Notary</option>
+                                <option value="itin">ITIN Application</option>
+                                <option value="bookkeeping">Bookkeeping</option>
+                                <option value="business-formation">Business Formation (LLC/EIN)</option>
+                                <option value="sales-tax">Sales Tax Filing</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" placeholder="Tell us about your needs..." rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+
+                <div class="contact-info-panel">
+                    <div class="contact-info-card reveal">
+                        <h3>Contact Information</h3>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            </div>
+                            <div>
+                                <div class="info-label">Address</div>
+                                <div class="info-value">4302 S Claiborne Avenue<br>New Orleans, LA 70115</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </div>
+                            <div>
+                                <div class="info-label">Phone</div>
+                                <div class="info-value"><a href="tel:5045840377">(504) 584-0377</a></div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div>
+                                <div class="info-label">Hours</div>
+                                <div class="info-value">Mon – Fri: 9:00 AM – 5:30 PM<br>Saturday: 9:00 AM – 2:00 PM<br>Sunday: Closed</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            </div>
+                            <div>
+                                <div class="info-label">Email</div>
+                                <div class="info-value"><a href="mailto:info@tax-notary.net">info@tax-notary.net</a></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-map reveal">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3457.1!2d-90.1073!3d29.9512!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8620a5f3e0c4d60d%3A0x0!2s4302+S+Claiborne+Ave%2C+New+Orleans%2C+LA+70115!5e0!3m2!1sen!2sus!4v1" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Notary &amp; Tax Services location"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== FOOTER ====== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        </div>
+                        <div class="logo-text">
+                            Notary & Tax
+                            <span>Services</span>
+                        </div>
+                    </div>
+                    <p>Professional tax preparation and notary public services proudly serving the New Orleans community. Accurate, affordable, and always in your corner.</p>
+                    <div class="footer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        IRS Authorized E-File Provider
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <a href="#services">Services</a>
+                    <a href="#why">About Us</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#faq">FAQ</a>
+                    <a href="#contact">Contact</a>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <a href="#services">Tax Preparation</a>
+                    <a href="#services">Notary Public</a>
+                    <a href="#services">Business Services</a>
+                    <a href="#services">ITIN Applications</a>
+                    <a href="#services">Bookkeeping</a>
+                    <a href="#services">Sales Tax Filing</a>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <a href="tel:5045840377">(504) 584-0377</a>
+                    <a href="mailto:info@tax-notary.net">info@tax-notary.net</a>
+                    <a href="https://maps.google.com/?q=4302+S+Claiborne+Ave+New+Orleans+LA" target="_blank" rel="noopener">4302 S Claiborne Ave<br>New Orleans, LA 70115</a>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Facebook">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="#" aria-label="Instagram">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <a href="#" aria-label="Google">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>&copy; 2026 Notary & Tax Services. All rights reserved.</div>
+                <div>
+                    <a href="#">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ====== JAVASCRIPT ====== -->
+    <script>
+        // === Header Scroll ===
+        const header = document.getElementById('header');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 20);
+        }, { passive: true });
+
+        // === Mobile Menu ===
+        const hamburger = document.getElementById('hamburger');
+        const mobileNav = document.getElementById('mobileNav');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+            document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+        });
+
+        document.querySelectorAll('.mobile-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileNav.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // === Scroll Reveal ===
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 80);
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // === Counter Animation ===
+        const statNumbers = document.querySelectorAll('.stat-number[data-target]');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const target = parseInt(el.dataset.target);
+                    const suffix = target === 99 ? '%' : target === 1000 ? '+' : '+';
+                    const duration = 1800;
+                    const start = performance.now();
+
+                    function update(now) {
+                        const elapsed = now - start;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        const current = Math.round(eased * target);
+                        el.textContent = (target >= 1000 ? current.toLocaleString() : current) + suffix;
+                        if (progress < 1) requestAnimationFrame(update);
+                    }
+                    requestAnimationFrame(update);
+                    counterObserver.unobserve(el);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        statNumbers.forEach(el => counterObserver.observe(el));
+
+        // === FAQ Accordion ===
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const answer = item.querySelector('.faq-answer');
+                const isActive = item.classList.contains('active');
+
+                // Close all
+                document.querySelectorAll('.faq-item.active').forEach(open => {
+                    open.classList.remove('active');
+                    open.querySelector('.faq-answer').style.maxHeight = '0';
+                });
+
+                // Open clicked if it wasn't active
+                if (!isActive) {
+                    item.classList.add('active');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+            });
+        });
+
+        // === Countdown Timer ===
+        function updateCountdown() {
+            const deadline = new Date('April 15, 2026 23:59:59').getTime();
+            const now = new Date().getTime();
+            const diff = deadline - now;
+
+            if (diff <= 0) {
+                document.getElementById('cd-days').textContent = '0';
+                document.getElementById('cd-hours').textContent = '0';
+                document.getElementById('cd-mins').textContent = '0';
+                document.getElementById('cd-secs').textContent = '0';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('cd-days').textContent = days;
+            document.getElementById('cd-hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('cd-mins').textContent = mins.toString().padStart(2, '0');
+            document.getElementById('cd-secs').textContent = secs.toString().padStart(2, '0');
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // === Form Submit ===
+        function handleSubmit(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Message Sent!';
+            btn.style.background = '#059669';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = '';
+                btn.disabled = false;
+                e.target.reset();
+            }, 3000);
+        }
+
+        // === Smooth Scroll for Safari ===
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    const offset = 80;
+                    const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
