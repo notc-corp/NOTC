@@ -10,6 +10,10 @@ const NAV_ITEMS = [
   { href: "/owner/trips", label: "Trips", icon: "🚛" },
   { href: "/owner/expenses", label: "Expenses", icon: "💰" },
   { href: "/owner/reports", label: "Reports", icon: "📋" },
+  { href: "/owner/inspections", label: "Inspections", icon: "✅" },
+  { href: "/owner/map", label: "Fleet Map", icon: "🗺️" },
+  { href: "/owner/defects", label: "Issues", icon: "🔧" },
+  { href: "/owner/trucks", label: "Trucks", icon: "🚚" },
 ];
 
 export default function OwnerLayout({

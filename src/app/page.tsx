@@ -92,7 +92,7 @@ export default function LoginPage() {
               return (
                 <button
                   key={i}
-                  onClick={handleBackspace}
+                  onPointerDown={handleBackspace}
                   className="h-16 rounded-xl bg-slate-100 text-slate-800 text-2xl font-bold active:bg-slate-200 transition-colors flex items-center justify-center"
                 >
                   ←
@@ -102,7 +102,7 @@ export default function LoginPage() {
             return (
               <button
                 key={i}
-                onClick={() => handleDigit(digit)}
+                onPointerDown={() => handleDigit(digit)}
                 className="h-16 rounded-xl bg-slate-100 text-slate-800 text-2xl font-bold active:bg-slate-200 transition-colors"
               >
                 {digit}
@@ -112,7 +112,7 @@ export default function LoginPage() {
         </div>
 
         <button
-          onClick={handleSubmit}
+          onPointerDown={handleSubmit}
           disabled={loading || pin.length < 4}
           className="w-full h-16 rounded-xl bg-amber-600 text-white text-xl font-bold disabled:opacity-40 active:bg-amber-700 transition-colors"
         >

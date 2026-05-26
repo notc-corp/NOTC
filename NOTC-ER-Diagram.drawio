@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- COMPANIES (future) -->
+    <mxCell id="companies" value="компании (будущее)&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;название&#xa;псевдоним (уникальный)&#xa;дата_создания" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="40" y="40" width="240" height="140" as="geometry" />
+    </mxCell>
+
+    <!-- USERS -->
+    <mxCell id="users" value="пользователи&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_компании (будущее)&#xa;имя&#xa;роль: владелец | водитель&#xa;хэш_пин_кода&#xa;номер_грузовика → будет убрано&#xa;телефон&#xa;активен (да/нет)&#xa;дата_создания" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="320" y="40" width="260" height="230" as="geometry" />
+    </mxCell>
+
+    <!-- TRUCKS (future) -->
+    <mxCell id="trucks" value="грузовики (будущее)&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_компании (будущее)&#xa;номер (уникальный)&#xa;марка&#xa;модель&#xa;год&#xa;вин_номер&#xa;активен (да/нет)&#xa;дата_создания" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="640" y="40" width="240" height="230" as="geometry" />
+    </mxCell>
+
+    <!-- TRIPS -->
+    <mxCell id="trips" value="поездки&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_водителя&#xa;🔗 ид_грузовика (будущее)&#xa;статус: активна | завершена | отменена&#xa;одометр_старт&#xa;одометр_финиш&#xa;фото_старт (путь к файлу)&#xa;фото_финиш (путь к файлу)&#xa;данные_OCR_старт&#xa;данные_OCR_финиш&#xa;точность_OCR_старт&#xa;точность_OCR_финиш&#xa;время_старта&#xa;время_финиша&#xa;заметки" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="320" y="340" width="280" height="340" as="geometry" />
+    </mxCell>
+
+    <!-- EXPENSES -->
+    <mxCell id="expenses" value="расходы&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_поездки&#xa;🔗 ид_водителя&#xa;🔗 кто_загрузил&#xa;категория: топливо | дорога | обслуживание | еда | другое&#xa;сумма_в_центах&#xa;описание&#xa;путь_к_чеку&#xa;литры_галлоны&#xa;цена_за_галлон_в_центах&#xa;итого_топливо_в_центах&#xa;название_заправки&#xa;сырые_данные_OCR&#xa;точность_OCR&#xa;отредактировано_вручную (да/нет)&#xa;дата_создания" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+      <mxGeometry x="20" y="340" width="280" height="390" as="geometry" />
+    </mxCell>
+
+    <!-- INSPECTIONS -->
+    <mxCell id="inspections" value="осмотры&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_водителя&#xa;🔗 ид_поездки&#xa;тип: до_поездки | после_поездки&#xa;можно_ехать (да/нет)&#xa;есть_дефекты (да/нет)&#xa;выведен_из_эксплуатации (да/нет)&#xa;дата_завершения" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+      <mxGeometry x="660" y="340" width="280" height="220" as="geometry" />
+    </mxCell>
+
+    <!-- INSPECTION_ITEMS -->
+    <mxCell id="inspection_items" value="пункты_осмотра&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_осмотра&#xa;категория&#xa;пункт (название)&#xa;статус: ок | дефект | не применимо&#xa;заметки" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+      <mxGeometry x="980" y="340" width="280" height="180" as="geometry" />
+    </mxCell>
+
+    <!-- DEFECTS -->
+    <mxCell id="defects" value="дефекты&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_водителя&#xa;🔗 ид_поездки&#xa;🔗 ид_осмотра&#xa;🔗 кто_устранил&#xa;описание&#xa;серьёзность: незначительный | серьёзный | вне_эксплуатации&#xa;путь_к_фото&#xa;дата_устранения&#xa;заметки_по_устранению&#xa;дата_создания" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+      <mxGeometry x="660" y="630" width="280" height="260" as="geometry" />
+    </mxCell>
+
+    <!-- DOWNTIME_EVENTS -->
+    <mxCell id="downtime_events" value="простои&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_водителя&#xa;🔗 ид_поездки&#xa;🔗 ид_дефекта&#xa;причина&#xa;время_начала&#xa;время_окончания" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+      <mxGeometry x="980" y="630" width="280" height="200" as="geometry" />
+    </mxCell>
+
+    <!-- TRIP_LOCATIONS -->
+    <mxCell id="trip_locations" value="GPS_точки&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_поездки&#xa;🔗 ид_водителя&#xa;широта&#xa;долгота&#xa;скорость (миль/ч)&#xa;направление (0–360°)&#xa;точность (метры)&#xa;время_записи" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="20" y="800" width="280" height="230" as="geometry" />
+    </mxCell>
+
+    <!-- AUDIT_REPORTS -->
+    <mxCell id="audit_reports" value="аудит_отчёты&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;дата_отчёта&#xa;дата_генерации&#xa;данные_отчёта (JSON)&#xa;количество_аномалий" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="1310" y="40" width="280" height="160" as="geometry" />
+    </mxCell>
+
+    <!-- ANOMALIES -->
+    <mxCell id="anomalies" value="аномалии&#xa;━━━━━━━━━━━━━━━━━━━━━━&#xa;🔑 ид (первичный ключ)&#xa;🔗 ид_отчёта&#xa;🔗 ид_поездки&#xa;🔗 ид_расхода&#xa;🔗 ид_водителя&#xa;🔗 кто_устранил&#xa;тип&#xa;серьёзность: инфо | предупреждение | критично&#xa;сообщение&#xa;устранено (да/нет)&#xa;дата_устранения" style="shape=table;startSize=30;container=0;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fontSize=13;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="1310" y="270" width="280" height="280" as="geometry" />
+    </mxCell>
+
+    <!-- EDGES -->
+
+    <!-- companies → users -->
+    <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="companies" target="users">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- companies → trucks -->
+    <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="companies" target="trucks">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- users → trips -->
+    <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="users" target="trips">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- trucks → trips -->
+    <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="trucks" target="trips">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- trips → expenses -->
+    <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0;exitY=0.4;entryX=1;entryY=0.3;" edge="1" parent="1" source="trips" target="expenses">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- users → expenses -->
+    <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0;exitY=0.7;entryX=1;entryY=0.5;" edge="1" parent="1" source="users" target="expenses">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- trips → inspections -->
+    <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="trips" target="inspections">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- users → inspections -->
+    <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.3;entryX=0;entryY=0.3;" edge="1" parent="1" source="users" target="inspections">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- inspections → inspection_items -->
+    <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="inspections" target="inspection_items">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- inspections → defects -->
+    <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="inspections" target="defects">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- trips → defects -->
+    <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.8;entryX=0;entryY=0.3;" edge="1" parent="1" source="trips" target="defects">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- users → defects -->
+    <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.6;entryX=0;entryY=0.2;" edge="1" parent="1" source="users" target="defects">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- defects → downtime_events -->
+    <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="defects" target="downtime_events">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- trips → downtime_events -->
+    <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=1;entryX=0.3;entryY=0;" edge="1" parent="1" source="trips" target="downtime_events">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- trips → trip_locations -->
+    <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="trips" target="trip_locations">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- users → trip_locations -->
+    <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0;exitY=1;entryX=0;entryY=0;" edge="1" parent="1" source="users" target="trip_locations">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- audit_reports → anomalies -->
+    <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="audit_reports" target="anomalies">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- trips → anomalies -->
+    <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.5;entryX=0;entryY=0.3;" edge="1" parent="1" source="trips" target="anomalies">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- expenses → anomalies -->
+    <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;endArrow=ERmany;startArrow=ERone;exitX=1;exitY=0.2;entryX=0;entryY=0.5;" edge="1" parent="1" source="expenses" target="anomalies">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- LEGEND -->
+    <mxCell id="legend_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="1310" y="620" width="280" height="290" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_title" value="ЛЕГЕНДА" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=15;" vertex="1" parent="1">
+      <mxGeometry x="1310" y="625" width="280" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_pk" value="🔑  первичный ключ — уникальный ИД записи" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="658" width="260" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_fk" value="🔗  внешний ключ — ссылка на другую таблицу" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="688" width="260" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_arrow" value="——▶  стрелка читается: «один → много»" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="718" width="260" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_blue" value="🔵  Синий — GPS и компании" style="text;html=1;strokeColor=none;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="753" width="260" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_green" value="🟢  Зелёный — пользователи и поездки" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="783" width="260" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_orange" value="🟠  Оранжевый — расходы" style="text;html=1;strokeColor=none;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="813" width="260" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_purple" value="🟣  Фиолетовый — осмотры транспорта" style="text;html=1;strokeColor=none;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="843" width="260" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_red" value="🔴  Красный — дефекты и простои" style="text;html=1;strokeColor=none;fillColor=#f8cecc;strokeColor=#b85450;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="873" width="260" height="25" as="geometry" />
+    </mxCell>
+    <mxCell id="legend_yellow" value="🟡  Жёлтый — грузовики и отчёты" style="text;html=1;strokeColor=none;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="903" width="260" height="25" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>

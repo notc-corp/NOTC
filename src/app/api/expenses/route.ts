@@ -50,6 +50,48 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  const contentType = req.headers.get("content-type") || "";
+
+  // JSON body — used by batch receipt save from scan flow
+  if (contentType.includes("application/json")) {
+    const body = await req.json();
+
+    const targetDriverId = session.userId;
+    // After end trip: find most recent trip (completed or active)
+    const activeTrip = db
+      .select()
+      .from(trips)
+      .where(and(eq(trips.driverId, targetDriverId), eq(trips.status, "active")))
+      .get() || db
+      .select()
+      .from(trips)
+      .where(and(eq(trips.driverId, targetDriverId), eq(trips.status, "completed")))
+      .orderBy(desc(trips.endedAt))
+      .get();
+
+    const result = db
+      .insert(expenses)
+      .values({
+        tripId: activeTrip?.id || null,
+        driverId: targetDriverId,
+        uploadedBy: session.userId,
+        category: body.category as "fuel" | "tolls" | "maintenance" | "food" | "other",
+        amountCents: body.amountCents ?? 0,
+        description: body.description || null,
+        receiptPath: body.receiptPath || null,
+        gallons: body.gallons || null,
+        pricePerGallonCents: body.pricePerGallonCents || null,
+        fuelTotalCents: body.amountCents || null,
+        stationName: body.merchant || null,
+        isManuallyEdited: body.isManuallyEdited ?? false,
+      })
+      .returning()
+      .get();
+
+    return NextResponse.json({ expense: result });
+  }
+
+  // FormData body — used by driver receipt photo upload
   const formData = await req.formData();
   const photo = formData.get("photo") as File | null;
   const category = formData.get("category") as string;

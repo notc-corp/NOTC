@@ -6,12 +6,18 @@ export interface SessionData {
   userId: number;
   role: "owner" | "driver";
   name: string;
+  companyId?: number;
+}
+
+const secret = process.env.SESSION_SECRET;
+if (!secret) {
+  throw new Error(
+    "SESSION_SECRET env var is required. Create .env.local and add SESSION_SECRET=<32+ char string>"
+  );
 }
 
 const sessionOptions: SessionOptions = {
-  password:
-    process.env.SESSION_SECRET ||
-    "this-is-a-dev-secret-change-in-production-must-be-32-chars!!",
+  password: secret,
   cookieName: "audit-session",
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",

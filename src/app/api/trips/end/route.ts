@@ -39,11 +39,14 @@ export async function POST(req: NextRequest) {
 
   if (photo) {
     filePath = await saveUpload(photo, "odometer");
-    const ocrResult = await extractOdometer(filePath);
-    ocrRaw = JSON.stringify(ocrResult);
-    confidence = ocrResult.confidence;
-    if (!mileage && ocrResult.mileage) {
-      mileage = ocrResult.mileage;
+    // Only run OCR if mileage wasn't provided by the client (already confirmed by user)
+    if (!mileage) {
+      const ocrResult = await extractOdometer(filePath);
+      ocrRaw = JSON.stringify(ocrResult);
+      confidence = ocrResult.confidence;
+      if (ocrResult.mileage) {
+        mileage = ocrResult.mileage;
+      }
     }
   }
 

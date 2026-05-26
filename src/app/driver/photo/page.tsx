@@ -78,7 +78,7 @@ export default function PhotoCapture() {
           body: formData,
         });
         if (res.ok) {
-          router.push("/driver");
+          router.push("/driver/receipts");
         }
       }
     } catch {

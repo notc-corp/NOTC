@@ -23,11 +23,21 @@ interface Driver {
   isActive: boolean;
 }
 
+interface Analysis {
+  summary: string;
+  insights: string[];
+  anomalies: string[];
+  forecast: string | null;
+}
+
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisDays, setAnalysisDays] = useState(30);
   const [uploadDriver, setUploadDriver] = useState<string>("");
   const [uploadCategory, setUploadCategory] = useState("fuel");
   const [uploadPhoto, setUploadPhoto] = useState<File | null>(null);
@@ -53,6 +63,16 @@ export default function ExpensesPage() {
   }, [searchParams]);
 
   const formatDollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
+  const runAnalysis = async () => {
+    setAnalysisLoading(true);
+    try {
+      const res = await fetch(`/api/ai/expenses-analysis?days=${analysisDays}`);
+      setAnalysis(await res.json());
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
 
   const handleUpload = async () => {
     if (!uploadPhoto || !uploadDriver) return;
@@ -108,6 +128,79 @@ export default function ExpensesPage() {
         >
           {showUpload ? "Cancel" : "📷 Upload Receipt"}
         </button>
+      </div>
+
+      {/* AI Analysis */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-slate-900">🤖 AI Expense Analysis</h2>
+            <p className="text-sm text-slate-500 mt-0.5">Anomalies, trends and forecast</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={analysisDays}
+              onChange={(e) => setAnalysisDays(Number(e.target.value))}
+              className="text-sm border border-slate-200 rounded-lg px-2 py-1 text-slate-700"
+            >
+              <option value={7}>7 days</option>
+              <option value={30}>30 days</option>
+              <option value={90}>90 days</option>
+            </select>
+            <button
+              onClick={runAnalysis}
+              disabled={analysisLoading}
+              className="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium active:bg-violet-700 disabled:opacity-50"
+            >
+              {analysisLoading ? "Analyzing..." : "Analyze"}
+            </button>
+          </div>
+        </div>
+
+        {analysisLoading && (
+          <div className="border-t border-slate-100 p-6 text-center text-slate-400">
+            <div className="text-3xl mb-2 animate-pulse">🤖</div>
+            <p>Analyzing your expenses...</p>
+          </div>
+        )}
+
+        {analysis && !analysisLoading && (
+          <div className="border-t border-slate-100 p-4 space-y-3">
+            <p className="text-slate-700 text-sm">{analysis.summary}</p>
+
+            {analysis.insights.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Insights</p>
+                <ul className="space-y-1">
+                  {analysis.insights.map((ins, i) => (
+                    <li key={i} className="text-sm text-slate-700 flex gap-2">
+                      <span className="text-green-500 mt-0.5">✓</span>{ins}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {analysis.anomalies.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Anomalies</p>
+                <ul className="space-y-1">
+                  {analysis.anomalies.map((a, i) => (
+                    <li key={i} className="text-sm text-amber-700 flex gap-2 bg-amber-50 rounded-lg p-2">
+                      <span>⚠️</span>{a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {analysis.forecast && (
+              <div className="bg-blue-50 rounded-lg p-3 text-sm text-blue-800">
+                📈 <strong>Forecast:</strong> {analysis.forecast}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Upload on behalf form */}

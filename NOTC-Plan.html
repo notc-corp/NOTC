@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>NOTC — Стратегический план</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',Arial,sans-serif; font-size:8.5pt; color:#1a1a2e; background:#fff; }
+
+@page { margin: 12mm 14mm; }
+
+/* HEADER */
+.page-header {
+  display:flex; align-items:center; gap:12px;
+  border-bottom:3px solid #e94560; padding-bottom:6px; margin-bottom:8px;
+}
+.logo { font-size:22pt; font-weight:900; color:#e94560; letter-spacing:-2px; line-height:1; }
+.tagline { font-size:9pt; color:#0f3460; font-weight:600; }
+.meta { margin-left:auto; font-size:7.5pt; color:#888; text-align:right; }
+
+/* TOC */
+.toc { margin-bottom:8px; padding:5px 8px; background:#f5f7ff; border-radius:4px; }
+.toc-label { font-size:7pt; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+.toc-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px 8px; }
+.toc-item { font-size:7.5pt; color:#444; padding:1px 0; }
+.toc-item .n { color:#e94560; font-weight:700; margin-right:3px; }
+
+/* LAYOUT */
+.body-cols { display:block; }
+.full-width { }
+
+/* SECTION HEADER */
+.sh {
+  display:flex; align-items:center; gap:7px;
+  border-bottom:2px solid #e94560; padding-bottom:4px; margin:10px 0 5px 0;
+}
+.sh:first-child { margin-top:0; }
+.sn {
+  background:#e94560; color:#fff; width:20px; height:20px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:8pt; flex-shrink:0;
+}
+.st { font-size:10.5pt; font-weight:700; color:#0f3460; }
+
+h3 { font-size:8.5pt; color:#0f3460; margin:6px 0 3px; padding-left:6px; border-left:2px solid #e94560; font-weight:700; }
+h4 { font-size:8pt; color:#333; margin:4px 0 2px; font-weight:600; }
+p  { line-height:1.45; color:#444; margin-bottom:4px; font-size:8pt; }
+
+/* TABLES */
+table { width:100%; border-collapse:collapse; margin:4px 0; font-size:7.5pt; }
+thead tr { background:#0f3460; color:#fff; }
+thead th { padding:3px 6px; text-align:left; font-weight:600; }
+tbody tr:nth-child(even) { background:#f5f7ff; }
+tbody td { padding:3px 6px; border-bottom:1px solid #eee; }
+
+/* BADGES */
+.br { background:#fee2e2; color:#dc2626; padding:1px 5px; border-radius:8px; font-size:7pt; font-weight:600; }
+.bg { background:#dcfce7; color:#16a34a; padding:1px 5px; border-radius:8px; font-size:7pt; font-weight:600; }
+.bb { background:#dbeafe; color:#2563eb; padding:1px 5px; border-radius:8px; font-size:7pt; font-weight:600; }
+.bo { background:#ffedd5; color:#ea580c; padding:1px 5px; border-radius:8px; font-size:7pt; font-weight:600; }
+
+/* HIGHLIGHT BOXES */
+.hb { background:#f0f4ff; border-left:3px solid #0f3460; padding:5px 8px; border-radius:0 4px 4px 0; margin:4px 0; font-size:8pt; }
+.hb.r { background:#fff0f0; border-left-color:#e94560; }
+.hb.g { background:#f0fff4; border-left-color:#16a34a; }
+
+/* CHECKLIST */
+.cl { list-style:none; }
+.cl li { padding:2px 0 2px 18px; position:relative; border-bottom:1px solid #f5f5f5; font-size:8pt; color:#444; }
+.cl li::before { content:'☐'; position:absolute; left:0; color:#e94560; font-size:10pt; line-height:1.1; }
+.cl li.done::before { content:'☑'; color:#16a34a; }
+
+/* 2-COL CARDS */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:4px 0; }
+.card { background:#f8f9ff; border:1px solid #e0e4ff; border-radius:5px; padding:6px 8px; }
+.card h4 { margin-top:0; color:#0f3460; }
+.card p  { font-size:7.5pt; }
+
+/* TIMELINE — compact */
+.tl { margin:4px 0; }
+.tl-item { display:flex; gap:7px; margin-bottom:5px; align-items:flex-start; }
+.tl-dot { width:8px; height:8px; border-radius:50%; background:#e94560; flex-shrink:0; margin-top:3px; }
+.tl-dot.b { background:#0f3460; }
+.tl-dot.g { background:#16a34a; }
+.tl-dot.o { background:#ea580c; }
+.tl-content h4 { margin:0 0 1px; font-size:8pt; }
+.tl-content p  { margin:0; font-size:7.5pt; }
+
+/* PRICE CARDS */
+.price-row { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:4px 0; }
+.pc { border:1px solid #e0e4ff; border-radius:6px; padding:7px; text-align:center; }
+.pc.feat { border-color:#e94560; }
+.pc .pn { font-size:8.5pt; font-weight:700; color:#0f3460; }
+.pc .pr { font-size:14pt; font-weight:900; color:#e94560; margin:2px 0; }
+.pc .pr span { font-size:7.5pt; color:#888; font-weight:400; }
+.pc ul { list-style:none; text-align:left; font-size:7pt; color:#555; margin-top:3px; }
+.pc ul li { padding:1px 0; }
+.pc ul li::before { content:'✓ '; color:#16a34a; font-weight:700; }
+
+/* SECURITY / IP TABLE */
+.sec-table { width:100%; margin:4px 0; font-size:7.5pt; border-collapse:collapse; }
+.sec-table td { padding:3px 6px; border-bottom:1px solid #f0f0f0; vertical-align:top; }
+.sec-table td:first-child { width:22px; text-align:center; font-size:11pt; }
+.sec-table td:nth-child(2) { font-weight:600; color:#0f3460; white-space:nowrap; padding-right:8px; }
+.sec-table td:last-child { color:#555; }
+
+/* STAR SECTION */
+.star-sh { border-top:3px solid #e94560; }
+.star-sh .sn { background:#e94560; font-size:10pt; }
+.star-sh .st { color:#e94560; }
+
+/* FOOTER */
+footer { margin-top:10px; padding-top:6px; border-top:1px solid #ddd; display:flex; justify-content:space-between; font-size:7pt; color:#999; }
+
+@media print {
+  body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="logo">NOTC</div>
+  <div>
+    <div class="tagline">No-Office Trucking Companion — Стратегический план</div>
+    <div style="font-size:7.5pt;color:#888;">Одно приложение для всего цикла работы водителя: инспекция → поездка → расходы → отчёт</div>
+  </div>
+  <div class="meta">Апрель 2026 · v1.0<br>Конфиденциально</div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-label">Содержание</div>
+  <div class="toc-grid">
+    <div class="toc-item"><span class="n">1</span>Видение и рынок</div>
+    <div class="toc-item"><span class="n">2</span>Анализ конкурентов</div>
+    <div class="toc-item"><span class="n">3</span>План разработки · Заказчики</div>
+    <div class="toc-item"><span class="n">4</span>Инфраструктура</div>
+    <div class="toc-item"><span class="n">5</span>Монетизация</div>
+    <div class="toc-item"><span class="n">6</span>Листинг и рост</div>
+    <div class="toc-item"><span class="n">7</span>Безопасность</div>
+    <div class="toc-item"><span class="n">8</span>Защита IP</div>
+    <div class="toc-item"><span class="n">9</span>Финансирование</div>
+    <div class="toc-item"><span class="n">10</span>Ближайшие шаги</div>
+    <div class="toc-item"><span class="n">★</span>Быстрый запуск</div>
+  </div>
+</div>
+
+<!-- 1: РЫНОК — FULL WIDTH -->
+<div class="sh"><div class="sn">1</div><div class="st">Видение и рынок</div></div>
+<div class="hb"><strong>Миссия:</strong> Работает для 1 трака и масштабируется до корпоративного флота — без многолетних контрактов, без железа, модульная оплата.</div>
+<h3>Целевые сегменты</h3>
+<table>
+  <thead><tr><th>Сегмент</th><th>Флот</th><th>Боль</th><th>Решение</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Owner-Operator</strong></td><td>1</td><td>Дорого, не для него</td><td>Free/Solo $19</td></tr>
+    <tr><td><strong>Малый бизнес</strong></td><td>2–15</td><td>Нет IT отдела</td><td>Fleet $15/трак</td></tr>
+    <tr><td><strong>Средний</strong></td><td>15–100</td><td>Разные системы</td><td>Всё в одном</td></tr>
+    <tr><td><strong>Enterprise</strong></td><td>100+</td><td>Нет SSO/white-label</td><td>Custom+API</td></tr>
+  </tbody>
+</table>
+<h3>Рынок США</h3>
+<table>
+  <tbody>
+    <tr><td><strong>3.5 млн</strong></td><td>коммерческих водителей грузовиков</td></tr>
+    <tr><td><strong>$30+ млрд</strong></td><td>fleet management software к 2027</td></tr>
+    <tr><td><strong>350,000+</strong></td><td>owner-operators — первичный сегмент</td></tr>
+    <tr><td><strong>40%</strong></td><td>водителей испаноязычные → испанский в приоритете</td></tr>
+  </tbody>
+</table>
+
+<div class="body-cols">
+
+<!-- COL 1 -->
+<div>
+
+<!-- 2: КОНКУРЕНТЫ -->
+<div class="sh"><div class="sn">2</div><div class="st">Анализ конкурентов</div></div>
+<table>
+  <thead><tr><th>Конкурент</th><th>Цена</th><th>Контракт</th><th>Проблема</th><th>Наш ответ</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Samsara</strong></td><td>$40–60+железо</td><td><span class="br">3 года</span></td><td>Дорого, плохой саппорт</td><td>Без контракта, без железа</td></tr>
+    <tr><td><strong>Motive</strong></td><td>$150–300 железо</td><td><span class="bo">Гибкий</span></td><td>Только 10+ траков</td><td>Работает с 1 траком</td></tr>
+    <tr><td><strong>Verizon</strong></td><td>~$27/трак</td><td><span class="br">3 года</span></td><td>Непрозрачные цены</td><td>Открытые цены, self-service</td></tr>
+    <tr><td><strong>Geotab</strong></td><td>$30–40+дилер</td><td><span class="bo">Дилер</span></td><td>Лаги, слабый мобайл</td><td>Быстрый UI, mobile-first</td></tr>
+    <tr><td><strong>Whip Around</strong></td><td>Подписка</td><td><span class="bg">Нет</span></td><td>Только инспекции</td><td>Всё в одном приложении</td></tr>
+  </tbody>
+</table>
+<div class="hb g"><strong>Наш ответ:</strong> Без контракта · Без железа · 1 трак · Всё в одном · Модульная цена</div>
+
+<!-- 3: РАЗРАБОТКА -->
+<div class="sh"><div class="sn">3</div><div class="st">План разработки</div></div>
+<h3>Фаза 1 — MVP (0–2 мес)</h3>
+<ul class="cl">
+  <li class="done">PIN авторизация водитель/владелец</li>
+  <li class="done">Pre/Post Trip инспекция (DOT)</li>
+  <li class="done">Фото одометра + OCR</li>
+  <li class="done">Учёт расходов и чеков</li>
+  <li class="done">Отчёты для владельца</li>
+  <li>Тест на мобильном (iOS/Android)</li>
+  <li>Подпись водителя на инспекции</li>
+  <li>PWA — установка без App Store</li>
+  <li>Деплой Vercel + PostgreSQL</li>
+  <li>HTTPS, rate limiting, CSRF защита</li>
+</ul>
+<div class="hb r" style="margin:5px 0;">
+  <strong>📋 Модуль: Заказчики (Clients)</strong> — водитель выбирает заказчика при старте рейса; все трипы, расходы и фото автоматически привязываются к нему.<br>
+  <strong>Для владельца:</strong> создание/редактирование заказчиков · отчёты по каждому · фильтрация расходов и инспекций по клиенту.<br>
+  <strong>Для водителя:</strong> список активных заказчиков на экране «Start Trip» · один клик — данные идут в нужный аккаунт.
+</div>
+<table style="margin:4px 0 8px;">
+  <thead><tr><th>Сущность</th><th>Поля</th><th>Привязка</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Client</strong></td><td>name, contact, rate ($/mile), notes</td><td>→ Trip, Expense, Report</td></tr>
+    <tr><td><strong>Trip</strong></td><td>+ client_id (FK)</td><td>при старте рейса</td></tr>
+    <tr><td><strong>Expense / Фото</strong></td><td>наследуют client через trip</td><td>автоматически</td></tr>
+    <tr><td><strong>Report</strong></td><td>фильтр по client_id</td><td>Owner dashboard</td></tr>
+  </tbody>
+</table>
+
+<h3>Фаза 2 — Малый флот (2–4 мес)</h3>
+<ul class="cl">
+  <li>Мульти-водители и мульти-машины</li>
+  <li><strong>Управление заказчиками</strong> — CRUD для Admin, выбор при старте рейса</li>
+  <li><strong>Отчёт по заказчику</strong> — расходы, пробег, чеки за период</li>
+  <li>GPS трекинг (Geolocation API)</li>
+  <li>HOS — Hours of Service (базовый)</li>
+  <li>IFTA — топливный налог по штатам</li>
+  <li>Email/SMS уведомления</li>
+  <li>Испанский язык (i18n)</li>
+  <li>Offline режим для инспекций</li>
+</ul>
+<h3>Фаза 3 — Средний флот (4–8 мес)</h3>
+<ul class="cl">
+  <li>Dispatch — назначение рейсов</li>
+  <li>Maintenance — планирование ТО</li>
+  <li>Аналитика расхода топлива</li>
+  <li><strong>Биллинг по заказчикам</strong> — автогенерация инвойса (PDF) за период</li>
+  <li>Роли: Owner / Manager / Driver / Mechanic</li>
+  <li>Public API для интеграций</li>
+  <li>AI агенты: автоотчёты, аномалии</li>
+</ul>
+<h3>Фаза 4 — Enterprise (8–12 мес)</h3>
+<ul class="cl">
+  <li>SSO / корпоративный вход (SAML)</li>
+  <li>White-label версия</li>
+  <li>OBD-II интеграция</li>
+  <li>Нативные iOS и Android приложения</li>
+  <li>Мультиязычность (испанский, португальский)</li>
+  <li>BI дашборд и расширенная аналитика</li>
+</ul>
+
+<!-- 4: ИНФРАСТРУКТУРА -->
+<div class="sh"><div class="sn">4</div><div class="st">Техническая инфраструктура</div></div>
+<h3>Текущий стек</h3>
+<table>
+  <thead><tr><th>Слой</th><th>Технология</th><th>Статус</th></tr></thead>
+  <tbody>
+    <tr><td>Full-stack</td><td>Next.js 16 + TS + Tailwind</td><td><span class="bg">Готово</span></td></tr>
+    <tr><td>БД</td><td>SQLite → мигрировать PostgreSQL</td><td><span class="bo">Нужно</span></td></tr>
+    <tr><td>Auth</td><td>iron-session (PIN)</td><td><span class="bg">Готово</span></td></tr>
+    <tr><td>Хостинг</td><td>Только локально</td><td><span class="br">Нет прод.</span></td></tr>
+    <tr><td>OCR</td><td>OpenAI Vision API</td><td><span class="bg">Готово</span></td></tr>
+  </tbody>
+</table>
+<h3>Целевая инфраструктура</h3>
+<table>
+  <tbody>
+    <tr><td><strong>Vercel</strong></td><td>Хостинг, auto-scaling, бесплатно до порога</td></tr>
+    <tr><td><strong>Neon</strong></td><td>Serverless PostgreSQL, free 0.5GB</td></tr>
+    <tr><td><strong>Cloudflare R2</strong></td><td>Хранилище фото, дешевле S3 на 50%</td></tr>
+    <tr><td><strong>PWA</strong></td><td>Service Worker, offline, без App Store</td></tr>
+  </tbody>
+</table>
+<h3>Дорожная карта деплоя</h3>
+<div class="tl">
+  <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h4>Шаг 1 — Vercel + Neon (эта нед.)</h4><p>Продакшн, доступный глобально</p></div></div>
+  <div class="tl-item"><div class="tl-dot b"></div><div class="tl-content"><h4>Шаг 2 — PWA (след. нед.)</h4><p>Установка на телефон, push уведомления</p></div></div>
+  <div class="tl-item"><div class="tl-dot g"></div><div class="tl-content"><h4>Шаг 3 — Домен (1 мес.)</h4><p>notcapp.com ~$12/год</p></div></div>
+  <div class="tl-item"><div class="tl-dot o"></div><div class="tl-content"><h4>Шаг 4 — App Store (3–6 мес.)</h4><p>Google Play $25 · Apple $99/год</p></div></div>
+</div>
+
+</div><!-- end col 1 -->
+
+<!-- COL 2 -->
+<div>
+
+<!-- 5: МОНЕТИЗАЦИЯ -->
+<div class="sh"><div class="sn">5</div><div class="st">Монетизация и цены</div></div>
+<div class="price-row">
+  <div class="pc">
+    <div class="pn">Free</div>
+    <div class="pr">$0<span>/мес</span></div>
+    <ul><li>1 водитель</li><li>30 дней</li><li>Инспекция</li></ul>
+  </div>
+  <div class="pc feat">
+    <div class="pn">Solo ⭐</div>
+    <div class="pr">$19<span>/мес</span></div>
+    <ul><li>Все модули</li><li>PDF отчёты</li><li>IFTA</li></ul>
+  </div>
+  <div class="pc">
+    <div class="pn">Fleet</div>
+    <div class="pr">$15<span>/трак</span></div>
+    <ul><li>До 50 машин</li><li>Dispatch</li><li>GPS</li></ul>
+  </div>
+  <div class="pc">
+    <div class="pn">Enterprise</div>
+    <div class="pr">Custom</div>
+    <ul><li>SSO/API</li><li>White-label</li><li>SLA</li></ul>
+  </div>
+</div>
+<h3>Add-on модули</h3>
+<table>
+  <thead><tr><th>Модуль</th><th>Цена</th><th>Что включает</th></tr></thead>
+  <tbody>
+    <tr><td>Inspection Pro</td><td>$9/мес</td><td>Кастом чеклисты, подписи, PDF</td></tr>
+    <tr><td>Maintenance</td><td>$12/мес</td><td>ТО, напоминания, история</td></tr>
+    <tr><td>IFTA Reports</td><td>$9/мес</td><td>Авто расчёт налога по штатам</td></tr>
+    <tr><td>AI Assistant</td><td>$19/мес</td><td>Автоотчёты, аномалии, прогнозы</td></tr>
+    <tr><td>Fuel Analytics</td><td>$7/мес</td><td>Расход, сравнение, экономия</td></tr>
+  </tbody>
+</table>
+<div class="hb g"><strong>Прогноз:</strong> 100 Solo = $1,900/мес · 20 флотов×5 = $1,500/мес → $3,400/мес итого</div>
+
+<!-- 6: ЛИСТИНГ -->
+<div class="sh"><div class="sn">6</div><div class="st">Листинг и дистрибуция</div></div>
+<h3>Органика (мес. 1–3, бесплатно)</h3>
+<table>
+  <tbody>
+    <tr><td><strong>Reddit</strong></td><td>r/Truckers, r/OwnerOperators — история создания</td></tr>
+    <tr><td><strong>Facebook</strong></td><td>Owner Operators United — 500k+ аудитория</td></tr>
+    <tr><td><strong>YouTube/TikTok</strong></td><td>"Автоматизировал трак за 5 минут" — демо</td></tr>
+    <tr><td><strong>Product Hunt</strong></td><td>Tech-сообщество, первые подписчики</td></tr>
+  </tbody>
+</table>
+<h3>App Stores (мес. 3–6)</h3>
+<table>
+  <tbody>
+    <tr><td>Google Play</td><td>$25 раз</td><td>TWA или React Native</td></tr>
+    <tr><td>Apple App Store</td><td>$99/год</td><td>React Native + TestFlight</td></tr>
+    <tr><td>Microsoft Store</td><td>Бесплатно</td><td>PWA автоматически</td></tr>
+  </tbody>
+</table>
+<h3>B2B платформы (мес. 6–12)</h3>
+<table>
+  <tbody>
+    <tr><td>Capterra/G2</td><td>SaaS каталог — органический трафик</td></tr>
+    <tr><td>OOIDA</td><td>Ассоциация — 150,000+ owner-operators</td></tr>
+    <tr><td>DAT/Truckstop</td><td>Load boards — партнёрство/интеграция</td></tr>
+    <tr><td>ATA, NASTC</td><td>Enterprise через ассоциации</td></tr>
+  </tbody>
+</table>
+
+<!-- 7: БЕЗОПАСНОСТЬ -->
+<div class="sh"><div class="sn">7</div><div class="st">Безопасность</div></div>
+<div class="hb r"><strong>Важно:</strong> DVIR/HOS/IFTA — юр. документы. Утечка = штрафы DOT + иски. Безопасность обязательна.</div>
+<h3>Уровень 1 — Базовый (Фаза 1)</h3>
+<table class="sec-table">
+  <tbody>
+    <tr><td>🔒</td><td>HTTPS/TLS 1.3</td><td>Vercel авто-SSL, HTTP→HTTPS редирект</td></tr>
+    <tr><td>🛡️</td><td>Rate Limiting</td><td>5 попыток PIN / 15 мин, блок IP на 1 час</td></tr>
+    <tr><td>🍪</td><td>Сессии</td><td>HttpOnly, Secure, SameSite=Strict, выход 8ч</td></tr>
+    <tr><td>🔐</td><td>PIN хэш</td><td>bcrypt salt=12, не восстановить при утечке</td></tr>
+  </tbody>
+</table>
+<h3>Уровень 2 — Приложение (Фаза 2)</h3>
+<table class="sec-table">
+  <tbody>
+    <tr><td>🚫</td><td>SQL Injection</td><td>Drizzle ORM параметризованные запросы + Zod</td></tr>
+    <tr><td>🌐</td><td>XSS</td><td>React экранирует HTML, CSP заголовки</td></tr>
+    <tr><td>🔑</td><td>API Auth</td><td>Каждый endpoint проверяет сессию, RLS в БД</td></tr>
+    <tr><td>📁</td><td>Файлы</td><td>MIME проверка, 10MB лимит, private R2 bucket</td></tr>
+  </tbody>
+</table>
+<h3>Уровень 3 — Enterprise (Фаза 3–4)</h3>
+<table class="sec-table">
+  <tbody>
+    <tr><td>📋</td><td>Audit Log</td><td>Кто/что/когда/IP — неизменяемый лог</td></tr>
+    <tr><td>🔍</td><td>Pentest</td><td>OWASP ZAP авто + ручной перед Enterprise</td></tr>
+    <tr><td>🏥</td><td>SOC 2</td><td>Сертификация при 50+ B2B клиентах</td></tr>
+    <tr><td>💾</td><td>Бэкап</td><td>Ежедневный зашифр. + 7 дней point-in-time</td></tr>
+  </tbody>
+</table>
+
+<!-- 8: IP -->
+<div class="sh"><div class="sn">8</div><div class="st">Защита интеллектуальной собственности</div></div>
+<table>
+  <thead><tr><th>Действие</th><th>Приоритет</th><th>Цена</th><th>Когда</th></tr></thead>
+  <tbody>
+    <tr><td>Домен notcapp.com</td><td><span class="br">Срочно</span></td><td>$12/год</td><td>Сейчас</td></tr>
+    <tr><td>Terms of Service + Privacy Policy</td><td><span class="br">До запуска</span></td><td>$0–500</td><td>До деплоя</td></tr>
+    <tr><td>Copyright © в коде и репо</td><td><span class="bo">Высокий</span></td><td>$0</td><td>Эта неделя</td></tr>
+    <tr><td>US Copyright Office регистрация</td><td><span class="bb">Средний</span></td><td>$65</td><td>Фаза 1</td></tr>
+    <tr><td>USPTO Trademark (IC 042+009)</td><td><span class="bb">Средний</span></td><td>$300/класс</td><td>1-е клиенты</td></tr>
+    <tr><td>SOC 2 Type II сертификация</td><td><span class="bg">Низкий</span></td><td>$15k+</td><td>Enterprise</td></tr>
+  </tbody>
+</table>
+<p style="font-size:7.5pt;color:#666;margin-top:3px;">GitHub commit история = юр. доказательство даты создания. Код — proprietary, LICENSE файл запрещает использование без разрешения.</p>
+
+<!-- 9: ФИНАНСИРОВАНИЕ -->
+<div class="sh"><div class="sn">9</div><div class="st">Финансирование</div></div>
+<div class="hb g"><strong>До первых клиентов — $0/мес:</strong> Vercel Free + Neon Free + GitHub = полностью бесплатно</div>
+<h3>Минимальные расходы до запуска</h3>
+<table>
+  <tbody>
+    <tr><td>Домен notcapp.com</td><td>$12/год</td><td>Сейчас</td></tr>
+    <tr><td>Apple Developer</td><td>$99/год</td><td>Фаза 2</td></tr>
+    <tr><td>Google Play</td><td>$25 раз</td><td>Фаза 2</td></tr>
+    <tr><td>USPTO Trademark</td><td>$300/класс</td><td>Фаза 1</td></tr>
+    <tr><td><strong>Итого до запуска</strong></td><td><strong>~$450</strong></td><td></td></tr>
+  </tbody>
+</table>
+<h3>Этап 2 — Первые доходы → реинвестиция</h3>
+<p>При 50 платящих Solo подписчиках (~$950/мес) покрываются все операционные расходы. Далее — реинвестиция в маркетинг и найм.</p>
+<h3>Этап 3 — Внешние инвестиции (если нужно)</h3>
+<table>
+  <tbody>
+    <tr><td>Indie Hackers / AngelList</td><td>$25k–100k</td><td>Доля + менторство</td></tr>
+    <tr><td>OOIDA Foundation</td><td>$10k–50k</td><td>Грант без доли</td></tr>
+    <tr><td>Y Combinator / Techstars</td><td>$125k–500k</td><td>7–10% доли</td></tr>
+    <tr><td>SBA Microloan</td><td>до $50k</td><td>Кредит, низкий %</td></tr>
+  </tbody>
+</table>
+
+<!-- 10: БЛИЖАЙШИЕ ШАГИ -->
+<div class="sh"><div class="sn">10</div><div class="st">Ближайшие шаги</div></div>
+<div class="two-col">
+  <div>
+    <h3>Эта неделя</h3>
+    <ul class="cl">
+      <li>Проверить PIN + инспекции на телефоне</li>
+      <li>Copyright © 2026 NOTC в код</li>
+      <li>Купить домен notcapp.com</li>
+      <li>Деплой Vercel + Neon PostgreSQL</li>
+    </ul>
+    <h3>След. 2 недели</h3>
+    <ul class="cl">
+      <li>PWA манифест (установка на телефон)</li>
+      <li>Подпись водителя на инспекции</li>
+      <li>Terms of Service + Privacy Policy</li>
+      <li>Полный цикл тест на своём траке</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Следующий месяц</h3>
+    <ul class="cl">
+      <li>Миграция на PostgreSQL</li>
+      <li>Показ на Reddit / Facebook</li>
+      <li>5–10 отзывов реальных водителей</li>
+      <li>Запуск Free тарифа публично</li>
+    </ul>
+    <div class="hb" style="margin-top:6px;"><strong>Принцип:</strong> Дешевле Samsara. Проще Motive. Работает с 1 траком.</div>
+  </div>
+</div>
+
+</div><!-- end col 2 -->
+</div><!-- end body-cols -->
+
+<!-- БЫСТРАЯ МОНЕТИЗАЦИЯ — FULL WIDTH -->
+<div class="sh star-sh" style="margin-top:10px;"><div class="sn" style="background:#e94560;">★</div><div class="st" style="color:#e94560;">Быстрая монетизация — запуск уже сейчас</div></div>
+
+<div class="hb r"><strong>Стратегия:</strong> Не ждать полного продукта. Запустить минимальный платный пакет на базе готового функционала → первые клиенты → отзывы → дорабатываем по плану.</div>
+
+<div class="body-cols" style="margin-top:6px;">
+<div>
+  <h3>Что готово к продаже прямо сейчас</h3>
+  <table>
+    <thead><tr><th>Функция</th><th>Статус</th><th>Ценность</th></tr></thead>
+    <tbody>
+      <tr><td>Pre/Post Trip инспекция DOT</td><td><span class="bg">✓ Готово</span></td><td>Юридически обязательно</td></tr>
+      <tr><td>Учёт поездок + одометр</td><td><span class="bg">✓ Готово</span></td><td>Пробег для налоговой</td></tr>
+      <tr><td>Фото чеков + OCR расходов</td><td><span class="bg">✓ Готово</span></td><td>Замена бумажных чеков</td></tr>
+      <tr><td>Отчёты для владельца</td><td><span class="bg">✓ Готово</span></td><td>Сводка расходов/поездок</td></tr>
+      <tr><td>Деплой на Vercel</td><td><span class="bo">Нужно</span></td><td>Глобальный доступ</td></tr>
+      <tr><td>Stripe оплата</td><td><span class="bo">Нужно</span></td><td>Приём платежей онлайн</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Пакет Solo Starter — первый продукт</h3>
+  <div class="two-col">
+    <div class="card" style="border:1.5px solid #e94560;">
+      <h4 style="color:#e94560;">Solo Starter — $9/мес</h4>
+      <p>Для owner-operator с 1 траком.</p>
+      <ul class="cl" style="margin-top:3px;">
+        <li class="done" style="padding-left:18px;">Pre/Post Trip инспекция</li>
+        <li class="done" style="padding-left:18px;">Учёт поездок и пробега</li>
+        <li class="done" style="padding-left:18px;">Фото и учёт расходов</li>
+        <li class="done" style="padding-left:18px;">Месячный PDF отчёт</li>
+        <li class="done" style="padding-left:18px;">Телефон и ПК</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Почему $9 а не $19?</h4>
+      <p>На старте важнее набрать 50–100 пользователей и получить отзывы.</p>
+      <p style="margin-top:4px;">$9 — ниже психол. барьера. После 100 подписчиков — поднять до $19 для новых.</p>
+      <p style="margin-top:4px;"><strong>Stripe:</strong> $0 фикс. · 2.9%+$0.30 · чистыми $8.44 с подписки</p>
+    </div>
+  </div>
+</div>
+
+<div>
+  <h3>План запуска за 2 недели</h3>
+  <div class="tl">
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h4>День 1–3: Деплой</h4><p>Vercel + Neon + домен + полный тест на телефоне</p></div></div>
+    <div class="tl-item"><div class="tl-dot b"></div><div class="tl-content"><h4>День 4–7: Оплата</h4><p>Stripe подписка + страница тарифов + ToS</p></div></div>
+    <div class="tl-item"><div class="tl-dot g"></div><div class="tl-content"><h4>День 8–10: Контент</h4><p>Видео демо 2–3 мин + скриншоты + лендинг</p></div></div>
+    <div class="tl-item"><div class="tl-dot o"></div><div class="tl-content"><h4>День 11–14: Запуск</h4><p>Reddit r/Truckers · Facebook · Product Hunt</p></div></div>
+  </div>
+
+  <h3>Дорожная карта дохода</h3>
+  <table>
+    <thead><tr><th>Этап</th><th>Продукт</th><th>Клиенты</th><th>MRR</th></tr></thead>
+    <tbody>
+      <tr><td><strong>2 нед.</strong></td><td>Solo Starter $9</td><td>10</td><td>$90</td></tr>
+      <tr><td><strong>Мес. 1–2</strong></td><td>Solo Starter</td><td>50</td><td>$450</td></tr>
+      <tr><td><strong>Мес. 3</strong></td><td>Solo $19 + Fleet</td><td>100+5 фл.</td><td>$2,650</td></tr>
+      <tr><td><strong>Мес. 6</strong></td><td>Все + add-ons</td><td>300+20 фл.</td><td>$8,700</td></tr>
+      <tr><td><strong>Год 1</strong></td><td>Полный продукт</td><td>1000+</td><td>$25,000+</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<footer>
+  <span><strong>NOTC</strong> — No-Office Trucking Companion · Стратегический план · Апрель 2026</span>
+  <span>© 2026 NOTC. All rights reserved. Конфиденциально.</span>
+</footer>
+
+</body>
+</html>

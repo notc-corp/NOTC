@@ -5,7 +5,7 @@ import bcryptjs from "bcryptjs";
 import path from "path";
 
 async function seed() {
-  const dbPath = path.join(process.cwd(), "audit.db");
+  const dbPath = path.join(process.cwd(), "notc.db");
   const sqlite = new Database(dbPath);
   sqlite.pragma("journal_mode = WAL");
   sqlite.pragma("foreign_keys = ON");
@@ -80,6 +80,26 @@ async function seed() {
       resolved INTEGER NOT NULL DEFAULT 0,
       resolved_by INTEGER REFERENCES users(id),
       resolved_at TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS inspections (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      driver_id INTEGER NOT NULL REFERENCES users(id),
+      trip_id INTEGER REFERENCES trips(id),
+      type TEXT NOT NULL CHECK(type IN ('pre', 'post')),
+      safe_to_operate INTEGER,
+      has_defects INTEGER NOT NULL DEFAULT 0,
+      has_out_of_service INTEGER NOT NULL DEFAULT 0,
+      completed_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS inspection_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      inspection_id INTEGER NOT NULL REFERENCES inspections(id),
+      category TEXT NOT NULL,
+      item TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'ok' CHECK(status IN ('ok', 'defect', 'na')),
+      notes TEXT
     );
   `);
 

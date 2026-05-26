@@ -6,7 +6,7 @@ const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 
 export async function saveUpload(
   file: File,
-  subfolder: "odometer" | "receipts"
+  subfolder: "odometer" | "receipts" | "defects"
 ): Promise<string> {
   const dir = path.join(UPLOAD_DIR, subfolder);
   if (!fs.existsSync(dir)) {
