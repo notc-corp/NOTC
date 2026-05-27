@@ -1,24 +1,17 @@
-import fs from "fs";
-import path from "path";
+import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
-
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 
 export async function saveUpload(
   file: File,
   subfolder: "odometer" | "receipts" | "defects"
 ): Promise<string> {
-  const dir = path.join(UPLOAD_DIR, subfolder);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
   const ext = file.name.split(".").pop() || "jpg";
-  const filename = `${randomUUID()}.${ext}`;
-  const filePath = path.join(dir, filename);
+  const filename = `${subfolder}/${randomUUID()}.${ext}`;
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  fs.writeFileSync(filePath, buffer);
+  const blob = await put(filename, file, {
+    access: "public",
+    contentType: file.type || "image/jpeg",
+  });
 
-  return filePath;
+  return blob.url;
 }
