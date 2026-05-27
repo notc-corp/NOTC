@@ -29,7 +29,7 @@ export async function generateDailyReport(dateStr: string) {
   const nextDayStr = nextDay.toISOString().split("T")[0];
 
   // Get all completed trips for the date
-  const dayTrips = db
+  const dayTrips = await db
     .select({
       trip: trips,
       driverName: users.name,
@@ -42,17 +42,15 @@ export async function generateDailyReport(dateStr: string) {
         gte(trips.startedAt, dateStr),
         lte(trips.startedAt, nextDayStr)
       )
-    )
-    .all();
+    );
 
   // Get all expenses for the date
-  const dayExpenses = db
+  const dayExpenses = await db
     .select()
     .from(expenses)
     .where(
       and(gte(expenses.createdAt, dateStr), lte(expenses.createdAt, nextDayStr))
-    )
-    .all();
+    );
 
   // Calculate average fuel price for the day
   const fuelExpenses = dayExpenses.filter(
@@ -246,20 +244,19 @@ export async function generateDailyReport(dateStr: string) {
   };
 
   // Save report
-  const report = db
+  const [report] = await db
     .insert(auditReports)
     .values({
       reportDate: dateStr,
       reportJson: JSON.stringify(reportData),
       anomalyCount: anomalyList.length,
     })
-    .returning()
-    .get();
+    .returning();
 
   // Save anomalies
-  for (const a of anomalyList) {
-    db.insert(anomalies)
-      .values({
+  if (anomalyList.length > 0) {
+    await db.insert(anomalies).values(
+      anomalyList.map((a) => ({
         reportId: report.id,
         tripId: a.tripId,
         expenseId: a.expenseId,
@@ -267,8 +264,8 @@ export async function generateDailyReport(dateStr: string) {
         type: a.type,
         severity: a.severity,
         message: a.message,
-      })
-      .run();
+      }))
+    );
   }
 
   return report;

@@ -17,10 +17,10 @@ export async function GET(req: NextRequest) {
   const days = parseInt(url.searchParams.get("days") || "30");
   const since = new Date(Date.now() - days * 86400000).toISOString().split("T")[0];
 
-  const [expRows, tripRows] = [
-    db.select().from(expenses).where(gte(expenses.createdAt, since)).orderBy(desc(expenses.createdAt)).all(),
-    db.select().from(trips).where(gte(trips.startedAt, since)).orderBy(desc(trips.startedAt)).all(),
-  ];
+  const [expRows, tripRows] = await Promise.all([
+    db.select().from(expenses).where(gte(expenses.createdAt, since)).orderBy(desc(expenses.createdAt)),
+    db.select().from(trips).where(gte(trips.startedAt, since)).orderBy(desc(trips.startedAt)),
+  ]);
 
   const totalExpCents = expRows.reduce((s, e) => s + e.amountCents, 0);
   const fuelExpCents = expRows.filter(e => e.category === "fuel").reduce((s, e) => s + e.amountCents, 0);

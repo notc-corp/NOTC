@@ -19,10 +19,10 @@ export async function PATCH(
     return NextResponse.json({ error: "Text required" }, { status: 400 });
   }
 
-  const note = db.update(defectNotes)
+  const [note] = await db.update(defectNotes)
     .set({ text: body.text.trim(), updatedAt: new Date().toISOString() })
     .where(eq(defectNotes.id, parseInt(noteId)))
-    .returning().get();
+    .returning();
 
   return NextResponse.json({ note });
 }
@@ -37,7 +37,7 @@ export async function DELETE(
   }
 
   const { noteId } = await params;
-  db.delete(defectNotes).where(eq(defectNotes.id, parseInt(noteId))).run();
+  await db.delete(defectNotes).where(eq(defectNotes.id, parseInt(noteId)));
 
   return NextResponse.json({ ok: true });
 }

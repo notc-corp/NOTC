@@ -7,11 +7,10 @@ export async function GET() {
   const session = await getSession();
   if (!session.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const trucks = db
+  const trucks = await db
     .select()
     .from(schema.trucks)
-    .orderBy(schema.trucks.number)
-    .all();
+    .orderBy(schema.trucks.number);
 
   return NextResponse.json(trucks);
 }
@@ -27,7 +26,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Truck number is required" }, { status: 400 });
   }
 
-  const result = db
+  const [result] = await db
     .insert(schema.trucks)
     .values({
       number: number.trim(),
@@ -37,8 +36,7 @@ export async function POST(req: NextRequest) {
       vin: vin?.trim() || null,
       licensePlate: licensePlate?.trim() || null,
     })
-    .returning()
-    .get();
+    .returning();
 
   return NextResponse.json(result, { status: 201 });
 }

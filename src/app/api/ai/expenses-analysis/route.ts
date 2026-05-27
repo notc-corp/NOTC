@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
   const days = parseInt(url.searchParams.get("days") || "30");
   const since = new Date(Date.now() - days * 86400000).toISOString().split("T")[0];
 
-  const rows = db.select().from(expenses).where(gte(expenses.createdAt, since))
-    .orderBy(desc(expenses.createdAt)).all();
+  const rows = await db.select().from(expenses).where(gte(expenses.createdAt, since))
+    .orderBy(desc(expenses.createdAt));
 
   if (rows.length === 0) {
     return NextResponse.json({ insights: [], anomalies: [], forecast: null, summary: "No expenses in this period." });

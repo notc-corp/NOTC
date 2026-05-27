@@ -25,12 +25,11 @@ export async function PATCH(
   if (body.isActive !== undefined) updates.isActive = body.isActive;
   if (body.pin) updates.pinHash = await hashPin(body.pin);
 
-  const result = db
+  const [result] = await db
     .update(users)
     .set(updates)
     .where(eq(users.id, userId))
-    .returning()
-    .get();
+    .returning();
 
   return NextResponse.json({
     user: {
@@ -55,11 +54,9 @@ export async function DELETE(
   const { id } = await params;
   const userId = parseInt(id);
 
-  // Soft delete — just deactivate
-  db.update(users)
+  await db.update(users)
     .set({ isActive: false })
-    .where(eq(users.id, userId))
-    .run();
+    .where(eq(users.id, userId));
 
   return NextResponse.json({ ok: true });
 }

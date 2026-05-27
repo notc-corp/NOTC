@@ -10,9 +10,8 @@ export async function GET() {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 
-  const results = db.select().from(downtimeEvents)
-    .orderBy(desc(downtimeEvents.startedAt))
-    .all();
+  const results = await db.select().from(downtimeEvents)
+    .orderBy(desc(downtimeEvents.startedAt));
 
   return NextResponse.json({ downtimes: results });
 }

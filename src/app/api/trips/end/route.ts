@@ -13,13 +13,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Find active trip
-  const activeTrip = db
+  const activeTrip = (await db
     .select()
     .from(trips)
     .where(
       and(eq(trips.driverId, session.userId), eq(trips.status, "active"))
-    )
-    .get();
+    ))[0];
 
   if (!activeTrip) {
     return NextResponse.json(
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const result = db
+  const [result] = await db
     .update(trips)
     .set({
       status: "completed",
@@ -61,8 +60,7 @@ export async function POST(req: NextRequest) {
       endedAt: new Date().toISOString(),
     })
     .where(eq(trips.id, activeTrip.id))
-    .returning()
-    .get();
+    .returning();
 
   return NextResponse.json({ trip: result });
 }

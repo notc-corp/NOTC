@@ -21,12 +21,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.licensePlate !== undefined) updates.licensePlate = body.licensePlate?.trim() || null;
   if (body.isActive !== undefined) updates.isActive = body.isActive;
 
-  const result = db
+  const [result] = await db
     .update(schema.trucks)
     .set(updates)
     .where(eq(schema.trucks.id, parseInt(id)))
-    .returning()
-    .get();
+    .returning();
 
   if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(result);
@@ -39,10 +38,9 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   }
 
   const { id } = await params;
-  db.update(schema.trucks)
+  await db.update(schema.trucks)
     .set({ isActive: false })
-    .where(eq(schema.trucks.id, parseInt(id)))
-    .run();
+    .where(eq(schema.trucks.id, parseInt(id)));
 
   return NextResponse.json({ ok: true });
 }

@@ -9,9 +9,8 @@ export async function GET() {
   const session = await getSession();
   if (!session.userId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const active = db.select().from(downtimeEvents)
-    .where(and(eq(downtimeEvents.driverId, session.userId), isNull(downtimeEvents.endedAt)))
-    .get();
+  const active = (await db.select().from(downtimeEvents)
+    .where(and(eq(downtimeEvents.driverId, session.userId), isNull(downtimeEvents.endedAt))))[0];
 
   return NextResponse.json({ downtime: active || null });
 }
@@ -24,25 +23,22 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { defectId, reason } = body;
 
-  // End any existing active downtime first
-  const existing = db.select().from(downtimeEvents)
-    .where(and(eq(downtimeEvents.driverId, session.userId), isNull(downtimeEvents.endedAt)))
-    .get();
+  const existing = (await db.select().from(downtimeEvents)
+    .where(and(eq(downtimeEvents.driverId, session.userId), isNull(downtimeEvents.endedAt))))[0];
   if (existing) {
-    db.update(downtimeEvents).set({ endedAt: new Date().toISOString() })
-      .where(eq(downtimeEvents.id, existing.id)).run();
+    await db.update(downtimeEvents).set({ endedAt: new Date().toISOString() })
+      .where(eq(downtimeEvents.id, existing.id));
   }
 
-  const activeTrip = db.select().from(trips)
-    .where(and(eq(trips.driverId, session.userId), eq(trips.status, "active")))
-    .get();
+  const activeTrip = (await db.select().from(trips)
+    .where(and(eq(trips.driverId, session.userId), eq(trips.status, "active"))))[0];
 
-  const result = db.insert(downtimeEvents).values({
+  const [result] = await db.insert(downtimeEvents).values({
     driverId: session.userId,
     tripId: activeTrip?.id || null,
     defectId: defectId || null,
     reason: reason || null,
-  }).returning().get();
+  }).returning();
 
   return NextResponse.json({ downtime: result });
 }
@@ -52,16 +48,15 @@ export async function PATCH() {
   const session = await getSession();
   if (!session.userId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const active = db.select().from(downtimeEvents)
-    .where(and(eq(downtimeEvents.driverId, session.userId), isNull(downtimeEvents.endedAt)))
-    .get();
+  const active = (await db.select().from(downtimeEvents)
+    .where(and(eq(downtimeEvents.driverId, session.userId), isNull(downtimeEvents.endedAt))))[0];
 
   if (!active) return NextResponse.json({ error: "No active downtime" }, { status: 400 });
 
-  const result = db.update(downtimeEvents)
+  const [result] = await db.update(downtimeEvents)
     .set({ endedAt: new Date().toISOString() })
     .where(eq(downtimeEvents.id, active.id))
-    .returning().get();
+    .returning();
 
   return NextResponse.json({ downtime: result });
 }

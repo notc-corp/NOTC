@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { eq, desc } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -11,11 +11,10 @@ export async function GET(req: NextRequest) {
   const tripId = searchParams.get("tripId");
   const type = searchParams.get("type");
 
-  const allInspections = db
+  const allInspections = await db
     .select()
     .from(schema.inspections)
-    .orderBy(desc(schema.inspections.completedAt))
-    .all();
+    .orderBy(desc(schema.inspections.completedAt));
 
   const filtered = allInspections.filter((i) => {
     if (session.role === "driver" && i.driverId !== session.userId) return false;
@@ -42,7 +41,7 @@ export async function POST(req: NextRequest) {
   const hasOutOfService = items.some((i) => i.status === "defect" && i.category === "OUT-OF-SERVICE");
   const safeToOperate = !hasOutOfService;
 
-  const inspection = db
+  const [inspection] = await db
     .insert(schema.inspections)
     .values({
       driverId: session.userId,
@@ -53,11 +52,10 @@ export async function POST(req: NextRequest) {
       hasOutOfService,
       completedAt: new Date().toISOString(),
     })
-    .returning()
-    .get();
+    .returning();
 
   if (items.length > 0) {
-    db.insert(schema.inspectionItems).values(
+    await db.insert(schema.inspectionItems).values(
       items.map((i) => ({
         inspectionId: inspection.id,
         category: i.category,
@@ -65,7 +63,7 @@ export async function POST(req: NextRequest) {
         status: i.status,
         notes: i.notes ?? null,
       }))
-    ).run();
+    );
   }
 
   return NextResponse.json({ inspection, safeToOperate });

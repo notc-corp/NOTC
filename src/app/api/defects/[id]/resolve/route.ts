@@ -16,14 +16,14 @@ export async function PATCH(
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
 
-  const result = db.update(defects)
+  const [result] = await db.update(defects)
     .set({
       resolvedAt: new Date().toISOString(),
       resolvedBy: session.userId,
       resolutionNotes: body.notes || null,
     })
     .where(eq(defects.id, parseInt(id)))
-    .returning().get();
+    .returning();
 
   return NextResponse.json({ defect: result });
 }

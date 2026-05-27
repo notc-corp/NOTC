@@ -16,18 +16,16 @@ export async function GET(
   const { id } = await params;
   const tripId = parseInt(id);
 
-  const trip = db.select().from(trips).where(eq(trips.id, tripId)).get();
+  const trip = (await db.select().from(trips).where(eq(trips.id, tripId)))[0];
   if (!trip) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Drivers can only see their own trips
   if (session.role === "driver" && trip.driverId !== session.userId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const points = db.select().from(tripLocations)
+  const points = await db.select().from(tripLocations)
     .where(eq(tripLocations.tripId, tripId))
-    .orderBy(asc(tripLocations.recordedAt))
-    .all();
+    .orderBy(asc(tripLocations.recordedAt));
 
   return NextResponse.json({ trip, points });
 }

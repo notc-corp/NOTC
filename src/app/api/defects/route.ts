@@ -16,10 +16,9 @@ export async function GET(req: NextRequest) {
   if (session.role === "driver") conditions.push(eq(defects.driverId, session.userId));
   if (onlyOpen) conditions.push(isNull(defects.resolvedAt));
 
-  const results = db.select().from(defects)
+  const results = await db.select().from(defects)
     .where(conditions.length ? and(...conditions) : undefined)
-    .orderBy(desc(defects.createdAt))
-    .all();
+    .orderBy(desc(defects.createdAt));
 
   return NextResponse.json({ defects: results });
 }
@@ -37,20 +36,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Description and severity required" }, { status: 400 });
   }
 
-  const activeTrip = db.select().from(trips)
-    .where(and(eq(trips.driverId, session.userId), eq(trips.status, "active")))
-    .get();
+  const activeTrip = (await db.select().from(trips)
+    .where(and(eq(trips.driverId, session.userId), eq(trips.status, "active"))))[0];
 
   let photoPath: string | null = null;
   if (photo) photoPath = await saveUpload(photo, "defects");
 
-  const result = db.insert(defects).values({
+  const [result] = await db.insert(defects).values({
     driverId: session.userId,
     tripId: activeTrip?.id || null,
     description,
     severity: severity as "minor" | "major" | "out_of_service",
     photoPath,
-  }).returning().get();
+  }).returning();
 
   return NextResponse.json({ defect: result });
 }

@@ -13,13 +13,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Check for existing active trip
-  const activeTrips = db
+  const activeTrips = await db
     .select()
     .from(trips)
     .where(
       and(eq(trips.driverId, session.userId), eq(trips.status, "active"))
-    )
-    .all();
+    );
 
   if (activeTrips.length > 0) {
     return NextResponse.json(
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const result = db
+  const [result] = await db
     .insert(trips)
     .values({
       driverId: session.userId,
@@ -60,8 +59,7 @@ export async function POST(req: NextRequest) {
       startOcrRaw: ocrRaw,
       startOcrConfidence: confidence,
     })
-    .returning()
-    .get();
+    .returning();
 
   return NextResponse.json({ trip: result });
 }

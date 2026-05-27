@@ -14,11 +14,10 @@ export async function GET(
   }
 
   const { id } = await params;
-  const report = db
+  const report = (await db
     .select()
     .from(auditReports)
-    .where(eq(auditReports.id, parseInt(id)))
-    .get();
+    .where(eq(auditReports.id, parseInt(id))))[0];
 
   if (!report) {
     return NextResponse.json({ error: "Report not found" }, { status: 404 });

@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const companies = db.select().from(schema.companies).orderBy(schema.companies.name).all();
+  const companies = await db.select().from(schema.companies).orderBy(schema.companies.name);
   return NextResponse.json(companies);
 }
 
@@ -25,15 +25,14 @@ export async function POST(req: NextRequest) {
 
   const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
 
-  const result = db
+  const [result] = await db
     .insert(schema.companies)
     .values({
       name: name.trim(),
       slug: cleanSlug,
       primaryColor: primaryColor || "#d97706",
     })
-    .returning()
-    .get();
+    .returning();
 
   return NextResponse.json(result, { status: 201 });
 }

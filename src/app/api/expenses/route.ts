@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
 
   const conditions = [];
 
-  // Drivers can only see their own expenses
   if (session.role === "driver") {
     conditions.push(eq(expenses.driverId, session.userId));
   } else if (driverId) {
@@ -34,12 +33,11 @@ export async function GET(req: NextRequest) {
     conditions.push(eq(expenses.tripId, parseInt(tripId)));
   }
 
-  const results = db
+  const results = await db
     .select()
     .from(expenses)
     .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .orderBy(desc(expenses.createdAt))
-    .all();
+    .orderBy(desc(expenses.createdAt));
 
   return NextResponse.json({ expenses: results });
 }
@@ -52,24 +50,18 @@ export async function POST(req: NextRequest) {
 
   const contentType = req.headers.get("content-type") || "";
 
-  // JSON body — used by batch receipt save from scan flow
   if (contentType.includes("application/json")) {
     const body = await req.json();
-
     const targetDriverId = session.userId;
-    // After end trip: find most recent trip (completed or active)
-    const activeTrip = db
-      .select()
-      .from(trips)
-      .where(and(eq(trips.driverId, targetDriverId), eq(trips.status, "active")))
-      .get() || db
-      .select()
-      .from(trips)
+
+    const activeTripRows = await db.select().from(trips)
+      .where(and(eq(trips.driverId, targetDriverId), eq(trips.status, "active")));
+    const activeTrip = activeTripRows[0] ?? (await db.select().from(trips)
       .where(and(eq(trips.driverId, targetDriverId), eq(trips.status, "completed")))
       .orderBy(desc(trips.endedAt))
-      .get();
+      .limit(1))[0];
 
-    const result = db
+    const [result] = await db
       .insert(expenses)
       .values({
         tripId: activeTrip?.id || null,
@@ -85,33 +77,26 @@ export async function POST(req: NextRequest) {
         stationName: body.merchant || null,
         isManuallyEdited: body.isManuallyEdited ?? false,
       })
-      .returning()
-      .get();
+      .returning();
 
     return NextResponse.json({ expense: result });
   }
 
-  // FormData body — used by driver receipt photo upload
   const formData = await req.formData();
   const photo = formData.get("photo") as File | null;
   const category = formData.get("category") as string;
   const ocrDataStr = formData.get("ocrData") as string | null;
   const driverIdStr = formData.get("driverId") as string | null;
 
-  // Owner can submit on behalf of a driver
   const targetDriverId =
     session.role === "owner" && driverIdStr
       ? parseInt(driverIdStr)
       : session.userId;
 
-  // Find active trip for this driver
-  const activeTrip = db
+  const activeTrip = (await db
     .select()
     .from(trips)
-    .where(
-      and(eq(trips.driverId, targetDriverId), eq(trips.status, "active"))
-    )
-    .get();
+    .where(and(eq(trips.driverId, targetDriverId), eq(trips.status, "active"))))[0];
 
   let receiptPath: string | null = null;
   if (photo) {
@@ -123,15 +108,13 @@ export async function POST(req: NextRequest) {
     try {
       ocrData = JSON.parse(ocrDataStr);
     } catch {
-      // Ignore parse errors
+      // ignore
     }
   }
 
-  const amountCents = ocrData?.total
-    ? Math.round(ocrData.total * 100)
-    : 0;
+  const amountCents = ocrData?.total ? Math.round(ocrData.total * 100) : 0;
 
-  const result = db
+  const [result] = await db
     .insert(expenses)
     .values({
       tripId: activeTrip?.id || null,
@@ -145,15 +128,12 @@ export async function POST(req: NextRequest) {
       pricePerGallonCents: ocrData?.price_per_gallon
         ? Math.round(ocrData.price_per_gallon * 100)
         : null,
-      fuelTotalCents: ocrData?.total
-        ? Math.round(ocrData.total * 100)
-        : null,
+      fuelTotalCents: ocrData?.total ? Math.round(ocrData.total * 100) : null,
       stationName: ocrData?.station_name || null,
       ocrRaw: ocrDataStr,
       ocrConfidence: ocrData?.confidence || null,
     })
-    .returning()
-    .get();
+    .returning();
 
   return NextResponse.json({ expense: result });
 }

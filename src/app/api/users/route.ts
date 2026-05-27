@@ -10,7 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 
-  const allUsers = db
+  const allUsers = await db
     .select({
       id: users.id,
       name: users.name,
@@ -21,8 +21,7 @@ export async function GET() {
       createdAt: users.createdAt,
     })
     .from(users)
-    .where(eq(users.role, "driver"))
-    .all();
+    .where(eq(users.role, "driver"));
 
   return NextResponse.json({ users: allUsers });
 }
@@ -51,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   const pinHash = await hashPin(pin);
 
-  const result = db
+  const [result] = await db
     .insert(users)
     .values({
       name,
@@ -60,8 +59,7 @@ export async function POST(req: NextRequest) {
       truckNumber: truckNumber || null,
       phone: phone || null,
     })
-    .returning()
-    .get();
+    .returning();
 
   return NextResponse.json({
     user: {

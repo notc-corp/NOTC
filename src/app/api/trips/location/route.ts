@@ -16,15 +16,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Only track during active trip
-  const activeTrip = db.select().from(trips)
-    .where(and(eq(trips.driverId, session.userId), eq(trips.status, "active")))
-    .get();
+  const activeTrip = (await db.select().from(trips)
+    .where(and(eq(trips.driverId, session.userId), eq(trips.status, "active"))))[0];
 
   if (!activeTrip) {
     return NextResponse.json({ error: "No active trip" }, { status: 404 });
   }
 
-  const point = db.insert(tripLocations).values({
+  const [point] = await db.insert(tripLocations).values({
     tripId: activeTrip.id,
     driverId: session.userId,
     lat,
@@ -32,7 +31,7 @@ export async function POST(req: NextRequest) {
     speed: speed ?? null,
     heading: heading ?? null,
     accuracy: accuracy ?? null,
-  }).returning().get();
+  }).returning();
 
   return NextResponse.json({ point });
 }

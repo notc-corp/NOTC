@@ -14,10 +14,9 @@ export async function GET(
   }
 
   const { id } = await params;
-  const notes = db.select().from(defectNotes)
+  const notes = await db.select().from(defectNotes)
     .where(eq(defectNotes.defectId, parseInt(id)))
-    .orderBy(asc(defectNotes.createdAt))
-    .all();
+    .orderBy(asc(defectNotes.createdAt));
 
   return NextResponse.json({ notes });
 }
@@ -37,11 +36,11 @@ export async function POST(
     return NextResponse.json({ error: "Text required" }, { status: 400 });
   }
 
-  const note = db.insert(defectNotes).values({
+  const [note] = await db.insert(defectNotes).values({
     defectId: parseInt(id),
     authorId: session.userId,
     text: body.text.trim(),
-  }).returning().get();
+  }).returning();
 
   return NextResponse.json({ note });
 }

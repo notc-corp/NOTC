@@ -11,11 +11,10 @@ export async function GET() {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 
-  const reports = db
+  const reports = await db
     .select()
     .from(auditReports)
-    .orderBy(desc(auditReports.reportDate))
-    .all();
+    .orderBy(desc(auditReports.reportDate));
 
   return NextResponse.json({ reports });
 }

@@ -44,10 +44,9 @@ export async function GET(req: NextRequest) {
     conditions.push(eq(trips.status, status as "active" | "completed" | "cancelled"));
   }
 
-  const results =
-    conditions.length > 0
-      ? query.where(and(...conditions)).all()
-      : query.all();
+  const results = conditions.length > 0
+    ? await query.where(and(...conditions))
+    : await query;
 
   return NextResponse.json({ trips: results });
 }
