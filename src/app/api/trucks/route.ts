@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export async function GET() {
   const session = await getSession();
@@ -10,6 +10,7 @@ export async function GET() {
   const trucks = await db
     .select()
     .from(schema.trucks)
+    .where(session.companyId ? eq(schema.trucks.companyId, session.companyId) : undefined)
     .orderBy(schema.trucks.number);
 
   return NextResponse.json(trucks);
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
       year: year ? parseInt(year) : null,
       vin: vin?.trim() || null,
       licensePlate: licensePlate?.trim() || null,
+      companyId: session.companyId ?? null,
     })
     .returning();
 

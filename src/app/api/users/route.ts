@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession, hashPin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export async function GET() {
   const session = await getSession();
   if (!session.userId || session.role !== "owner") {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
+
+  const conditions = [eq(users.role, "driver")];
+  if (session.companyId) conditions.push(eq(users.companyId, session.companyId));
 
   const allUsers = await db
     .select({
@@ -21,7 +24,7 @@ export async function GET() {
       createdAt: users.createdAt,
     })
     .from(users)
-    .where(eq(users.role, "driver"));
+    .where(and(...conditions));
 
   return NextResponse.json({ users: allUsers });
 }
@@ -58,6 +61,7 @@ export async function POST(req: NextRequest) {
       pinHash,
       truckNumber: truckNumber || null,
       phone: phone || null,
+      companyId: session.companyId ?? null,
     })
     .returning();
 

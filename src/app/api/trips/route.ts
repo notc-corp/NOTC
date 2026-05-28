@@ -33,6 +33,10 @@ export async function GET(req: NextRequest) {
 
   const conditions = [];
 
+  if (session.companyId) {
+    conditions.push(eq(trips.companyId, session.companyId));
+  }
+
   // Drivers can only see their own trips
   if (session.role === "driver") {
     conditions.push(eq(trips.driverId, session.userId));

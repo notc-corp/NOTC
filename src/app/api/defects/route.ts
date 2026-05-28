@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
   const onlyOpen = url.searchParams.get("open") === "true";
 
   const conditions = [];
+  if (session.companyId) conditions.push(eq(defects.companyId, session.companyId));
   if (session.role === "driver") conditions.push(eq(defects.driverId, session.userId));
   if (onlyOpen) conditions.push(isNull(defects.resolvedAt));
 
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
   const [result] = await db.insert(defects).values({
     driverId: session.userId,
     tripId: activeTrip?.id || null,
+    companyId: session.companyId ?? null,
     description,
     severity: severity as "minor" | "major" | "out_of_service",
     photoPath,

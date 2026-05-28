@@ -34,12 +34,14 @@ export async function POST(req: NextRequest) {
     session.userId = matchedUser.id;
     session.role = matchedUser.role;
     session.name = matchedUser.name;
+    session.companyId = matchedUser.companyId ?? undefined;
     await session.save();
 
     return NextResponse.json({
       userId: matchedUser.id,
       role: matchedUser.role,
       name: matchedUser.name,
+      companyId: matchedUser.companyId,
     });
   } catch {
     return NextResponse.json(

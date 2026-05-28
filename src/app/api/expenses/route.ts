@@ -18,6 +18,10 @@ export async function GET(req: NextRequest) {
 
   const conditions = [];
 
+  if (session.companyId) {
+    conditions.push(eq(expenses.companyId, session.companyId));
+  }
+
   if (session.role === "driver") {
     conditions.push(eq(expenses.driverId, session.userId));
   } else if (driverId) {
@@ -67,6 +71,7 @@ export async function POST(req: NextRequest) {
         tripId: activeTrip?.id || null,
         driverId: targetDriverId,
         uploadedBy: session.userId,
+        companyId: session.companyId ?? null,
         category: body.category as "fuel" | "tolls" | "maintenance" | "food" | "other",
         amountCents: body.amountCents ?? 0,
         description: body.description || null,
@@ -120,6 +125,7 @@ export async function POST(req: NextRequest) {
       tripId: activeTrip?.id || null,
       driverId: targetDriverId,
       uploadedBy: session.userId,
+      companyId: session.companyId ?? null,
       category: category as "fuel" | "tolls" | "maintenance" | "food" | "other",
       amountCents,
       description: ocrData?.station_name || null,

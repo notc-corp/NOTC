@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
     .insert(trips)
     .values({
       driverId: session.userId,
+      companyId: session.companyId ?? null,
       status: "active",
       startOdometer: mileage,
       startPhotoPath: filePath,

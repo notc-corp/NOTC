@@ -17,6 +17,14 @@ export async function PATCH(
   const userId = parseInt(id);
   const body = await req.json();
 
+  // Ensure user belongs to same company
+  if (session.companyId) {
+    const [target] = await db.select({ companyId: users.companyId }).from(users).where(eq(users.id, userId));
+    if (!target || target.companyId !== session.companyId) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+  }
+
   const updates: Record<string, unknown> = {};
 
   if (body.name !== undefined) updates.name = body.name;
@@ -53,6 +61,14 @@ export async function DELETE(
 
   const { id } = await params;
   const userId = parseInt(id);
+
+  // Ensure user belongs to same company
+  if (session.companyId) {
+    const [target] = await db.select({ companyId: users.companyId }).from(users).where(eq(users.id, userId));
+    if (!target || target.companyId !== session.companyId) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+  }
 
   await db.update(users)
     .set({ isActive: false })
