@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { expenses, trips } from "@/db/schema";
 import { eq, and, desc, gte } from "drizzle-orm";
 import { saveUpload } from "@/lib/upload";
+import { notifyExpenseAdded } from "@/lib/notifications";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -84,6 +85,14 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
+    notifyExpenseAdded({
+      companyId: session.companyId,
+      driverName: session.name,
+      category: body.category,
+      amountCents: body.amountCents ?? 0,
+      stationName: body.merchant || null,
+    });
+
     return NextResponse.json({ expense: result });
   }
 
@@ -140,6 +149,14 @@ export async function POST(req: NextRequest) {
       ocrConfidence: ocrData?.confidence || null,
     })
     .returning();
+
+  notifyExpenseAdded({
+    companyId: session.companyId,
+    driverName: session.name,
+    category,
+    amountCents,
+    stationName: ocrData?.station_name || null,
+  });
 
   return NextResponse.json({ expense: result });
 }

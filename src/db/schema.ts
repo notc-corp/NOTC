@@ -6,6 +6,7 @@ export const companies = pgTable("companies", {
   slug: text("slug").notNull().unique(),
   logoPath: text("logo_path"),
   primaryColor: text("primary_color").default("#d97706"),
+  telegramChatId: text("telegram_chat_id"),
   createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
   isActive: boolean("is_active").notNull().default(true),
 });

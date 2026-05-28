@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { trips } from "@/db/schema";
+import { trips, expenses } from "@/db/schema";
 import { saveUpload } from "@/lib/upload";
 import { extractOdometer } from "@/lib/ocr";
 import { eq, and } from "drizzle-orm";
+import { notifyTripCompleted } from "@/lib/notifications";
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -61,6 +62,23 @@ export async function POST(req: NextRequest) {
     })
     .where(eq(trips.id, activeTrip.id))
     .returning();
+
+  const miles =
+    result.endOdometer && result.startOdometer
+      ? result.endOdometer - result.startOdometer
+      : null;
+
+  const tripExpenses = await db.select({ amountCents: expenses.amountCents })
+    .from(expenses)
+    .where(eq(expenses.tripId, activeTrip.id));
+  const totalExpensesCents = tripExpenses.reduce((s, e) => s + e.amountCents, 0);
+
+  notifyTripCompleted({
+    companyId: session.companyId,
+    driverName: session.name,
+    miles,
+    totalExpensesCents,
+  });
 
   return NextResponse.json({ trip: result });
 }

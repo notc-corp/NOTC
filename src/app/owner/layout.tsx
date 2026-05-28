@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/owner/map", label: "Fleet Map", icon: "🗺️" },
   { href: "/owner/defects", label: "Issues", icon: "🔧" },
   { href: "/owner/trucks", label: "Trucks", icon: "🚚" },
+  { href: "/owner/settings", label: "Settings", icon: "⚙️" },
 ];
 
 export default function OwnerLayout({
