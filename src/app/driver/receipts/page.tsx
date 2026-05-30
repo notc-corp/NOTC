@@ -84,7 +84,7 @@ export default function ReceiptScanPage() {
       const scanned: ScannedReceipt[] = (data.receipts || []).map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (r: any, i: number) => ({
-          id: `r-${i}`,
+          id: `r-new-${Date.now()}-${i}`,
           merchant: r.merchant || null,
           date: r.date || null,
           time: r.time || null,
@@ -107,7 +107,11 @@ export default function ReceiptScanPage() {
         return;
       }
 
-      setReceipts(scanned);
+      // Merge: keep already confirmed/edited receipts, append new pending ones
+      setReceipts(prev => [
+        ...prev.filter(r => r.status !== "pending"),
+        ...scanned,
+      ]);
       setStep("review");
     } catch {
       setError("Ошибка анализа. Проверь соединение и попробуй снова.");
@@ -467,7 +471,7 @@ export default function ReceiptScanPage() {
 
         {/* Add more photos */}
         <button
-          onClick={() => setStep("capture")}
+          onClick={() => { setPhotos([]); setPreviews([]); setStep("capture"); }}
           className="w-full h-12 rounded-xl border border-dashed border-slate-300 text-slate-500 text-sm active:bg-slate-50"
         >
           + Add more photos
