@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/owner/map", label: "Fleet Map", icon: "🗺️" },
   { href: "/owner/defects", label: "Issues", icon: "🔧" },
   { href: "/owner/trucks", label: "Trucks", icon: "🚚" },
+  { href: "/owner/salary", label: "Salary", icon: "💵" },
   { href: "/owner/trucks/accounting", label: "Accounting", icon: "📑" },
   { href: "/owner/settings", label: "Settings", icon: "⚙️" },
 ];

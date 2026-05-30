@@ -169,3 +169,38 @@ export const tripLocations = pgTable("trip_locations", {
   accuracy: real("accuracy"),
   recordedAt: text("recorded_at").notNull().$default(() => new Date().toISOString()),
 });
+
+export const salaryRates = pgTable("salary_rates", {
+  id: serial("id").primaryKey(),
+  driverId: integer("driver_id").notNull().references(() => users.id),
+  type: text("type", { enum: ["hourly", "per_ton"] }).notNull(),
+  rateCents: integer("rate_cents").notNull(),
+  createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
+});
+
+export const salaryPayments = pgTable("salary_payments", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").references(() => companies.id),
+  driverId: integer("driver_id").notNull().references(() => users.id),
+  amountCents: integer("amount_cents").notNull(),
+  notes: text("notes"),
+  paidAt: text("paid_at").notNull().$default(() => new Date().toISOString()),
+  createdBy: integer("created_by").references(() => users.id),
+});
+
+export const salaryEntries = pgTable("salary_entries", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").references(() => companies.id),
+  driverId: integer("driver_id").notNull().references(() => users.id),
+  type: text("type", { enum: ["hourly", "per_ton"] }).notNull(),
+  customer: text("customer"),
+  loadType: text("load_type"),
+  tons: real("tons"),
+  hours: real("hours"),
+  rateCents: integer("rate_cents").notNull(),
+  totalCents: integer("total_cents").notNull(),
+  notes: text("notes"),
+  entryDate: text("entry_date").notNull(),
+  paymentId: integer("payment_id"),
+  createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
+});

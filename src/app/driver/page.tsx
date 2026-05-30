@@ -198,6 +198,14 @@ export default function DriverDashboard() {
         </Link>
       )}
 
+      {/* Salary shortcut */}
+      <Link
+        href="/driver/salary"
+        className="block w-full h-14 rounded-xl bg-slate-700 text-white text-lg font-semibold active:bg-slate-800 transition-colors text-center leading-[3.5rem]"
+      >
+        💵 My Earnings
+      </Link>
+
       {/* Today's Expenses */}
       <div>
         <h2 className="text-lg font-semibold text-slate-600 mb-3">Today&apos;s Expenses</h2>
