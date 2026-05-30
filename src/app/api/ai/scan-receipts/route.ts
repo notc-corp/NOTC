@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { saveUpload } from "@/lib/upload";
 import Anthropic from "@anthropic-ai/sdk";
-import fs from "fs";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -51,10 +50,10 @@ export async function POST(req: NextRequest) {
 
   for (let i = 0; i < photos.length; i++) {
     const photo = photos[i];
+    const arrayBuffer = await photo.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
+    const mediaType = getMediaType(photo.name);
     const filePath = await saveUpload(photo, "receipts");
-    const imageData = fs.readFileSync(filePath);
-    const base64 = imageData.toString("base64");
-    const mediaType = getMediaType(filePath);
 
     try {
       const response = await anthropic.messages.create({

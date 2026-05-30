@@ -5,6 +5,15 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+async function readImageAsBase64(imagePath: string): Promise<string> {
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    const res = await fetch(imagePath);
+    const buf = await res.arrayBuffer();
+    return Buffer.from(buf).toString("base64");
+  }
+  return fs.readFileSync(imagePath).toString("base64");
+}
+
 export interface OdometerResult {
   mileage: number | null;
   confidence: number;
@@ -72,8 +81,7 @@ function getMediaType(
 export async function extractOdometer(
   imagePath: string
 ): Promise<OdometerResult> {
-  const imageData = fs.readFileSync(imagePath);
-  const base64 = imageData.toString("base64");
+  const base64 = await readImageAsBase64(imagePath);
   const mediaType = getMediaType(imagePath);
 
   const response = await anthropic.messages.create({
@@ -114,8 +122,7 @@ export async function extractOdometer(
 export async function extractReceipt(
   imagePath: string
 ): Promise<ReceiptResult> {
-  const imageData = fs.readFileSync(imagePath);
-  const base64 = imageData.toString("base64");
+  const base64 = await readImageAsBase64(imagePath);
   const mediaType = getMediaType(imagePath);
 
   const response = await anthropic.messages.create({
