@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import InstallPrompt from "@/components/InstallPrompt";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -97,6 +98,10 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
+
+        <div className="mt-4">
+          <InstallPrompt />
+        </div>
       </div>
 
       <footer className="mt-8 text-center text-sm text-slate-400 pb-4">
