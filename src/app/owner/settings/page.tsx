@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SettingsPage() {
   const [chatId, setChatId] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/companies/telegram")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.telegramChatId) setChatId(data.telegramChatId);
+      });
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);

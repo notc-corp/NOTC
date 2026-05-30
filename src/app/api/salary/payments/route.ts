@@ -18,7 +18,9 @@ export async function GET(req: NextRequest) {
       ? parseInt(driverIdParam)
       : null;
 
-  const conditions = driverId ? [eq(salaryPayments.driverId, driverId)] : [];
+  const conditions: ReturnType<typeof eq>[] = [];
+  if (driverId) conditions.push(eq(salaryPayments.driverId, driverId));
+  if (session.companyId) conditions.push(eq(salaryPayments.companyId, session.companyId));
 
   const payments = await db
     .select()

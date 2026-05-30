@@ -4,6 +4,23 @@ import { companies } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 
+export async function GET() {
+  const session = await getSession();
+  if (!session.userId || session.role !== "owner") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!session.companyId) {
+    return NextResponse.json({ telegramChatId: null });
+  }
+
+  const [company] = await db
+    .select({ telegramChatId: companies.telegramChatId })
+    .from(companies)
+    .where(eq(companies.id, session.companyId));
+
+  return NextResponse.json({ telegramChatId: company?.telegramChatId ?? null });
+}
+
 export async function PATCH(req: NextRequest) {
   const session = await getSession();
   if (!session.userId || session.role !== "owner") {
