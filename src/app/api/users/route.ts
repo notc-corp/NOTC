@@ -25,6 +25,7 @@ export async function GET() {
       createdAt: users.createdAt,
       lockedUntil: users.lockedUntil,
       failedAttempts: users.failedAttempts,
+      autoLogoutMidnight: users.autoLogoutMidnight,
     })
     .from(users)
     .where(and(...conditions));

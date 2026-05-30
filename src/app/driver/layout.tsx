@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -14,12 +14,13 @@ export default function DriverLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; role: string; autoLogoutMidnight?: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
   const [downtime, setDowntime] = useState<Downtime | null>(null);
   const [, setDowntimeTick] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
+  const midnightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const checkDowntime = useCallback(() => {
     fetch("/api/downtime").then(r => r.json()).then(d => setDowntime(d.downtime));
@@ -38,6 +39,26 @@ export default function DriverLayout({
     return h > 0 ? `${h}h ${m}m` : `${m}m ${s}s`;
   };
 
+  const handleLogout = useCallback(async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+  }, [router]);
+
+  // Schedule auto-logout at midnight
+  const scheduleMidnightLogout = useCallback((enabled: boolean) => {
+    if (midnightTimerRef.current) clearTimeout(midnightTimerRef.current);
+    if (!enabled) return;
+
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0); // next midnight in local time
+    const msUntilMidnight = midnight.getTime() - now.getTime();
+
+    midnightTimerRef.current = setTimeout(() => {
+      handleLogout();
+    }, msUntilMidnight);
+  }, [handleLogout]);
+
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => r.json())
@@ -47,10 +68,15 @@ export default function DriverLayout({
         } else {
           setUser(data.user);
           checkDowntime();
+          scheduleMidnightLogout(data.user.autoLogoutMidnight ?? true);
         }
         setLoading(false);
       });
-  }, [router, checkDowntime]);
+
+    return () => {
+      if (midnightTimerRef.current) clearTimeout(midnightTimerRef.current);
+    };
+  }, [router, checkDowntime, scheduleMidnightLogout]);
 
   // Refresh downtime check when navigating back to driver pages
   useEffect(() => { checkDowntime(); }, [pathname, checkDowntime]);
@@ -61,11 +87,6 @@ export default function DriverLayout({
     const t = setInterval(() => setDowntimeTick(n => n + 1), 1000);
     return () => clearInterval(t);
   }, [downtime]);
-
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-  };
 
   if (loading) {
     return (

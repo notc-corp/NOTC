@@ -38,6 +38,7 @@ export const users = pgTable("users", {
   failedAttempts: integer("failed_attempts").notNull().default(0),
   lockedUntil: text("locked_until"),
   lockLevel: integer("lock_level").notNull().default(0),
+  autoLogoutMidnight: boolean("auto_logout_midnight").notNull().default(true),
 });
 
 export const trips = pgTable("trips", {

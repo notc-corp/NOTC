@@ -37,6 +37,7 @@ export async function PATCH(
     updates.lockedUntil = null;
     updates.failedAttempts = 0;
   }
+  if (body.autoLogoutMidnight !== undefined) updates.autoLogoutMidnight = body.autoLogoutMidnight;
 
   const [result] = await db
     .update(users)

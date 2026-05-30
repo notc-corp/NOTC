@@ -11,6 +11,7 @@ interface Driver {
   isActive: boolean;
   lockedUntil: string | null;
   failedAttempts: number;
+  autoLogoutMidnight: boolean;
 }
 
 export default function DriversPage() {
@@ -24,6 +25,7 @@ export default function DriversPage() {
     password: "",
     truckNumber: "",
     phone: "",
+    autoLogoutMidnight: true,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [unlocking, setUnlocking] = useState<number | null>(null);
@@ -42,7 +44,7 @@ export default function DriversPage() {
   }, []);
 
   const resetForm = () => {
-    setForm({ name: "", username: "", password: "", truckNumber: "", phone: "" });
+    setForm({ name: "", username: "", password: "", truckNumber: "", phone: "", autoLogoutMidnight: true });
     setShowForm(false);
     setEditingId(null);
     setShowPassword(false);
@@ -52,11 +54,12 @@ export default function DriversPage() {
     if (!form.name || !form.username || (!editingId && !form.password)) return;
 
     if (editingId) {
-      const body: Record<string, string> = {
+      const body: Record<string, string | boolean> = {
         name: form.name,
         username: form.username,
         truckNumber: form.truckNumber,
         phone: form.phone,
+        autoLogoutMidnight: form.autoLogoutMidnight,
       };
       if (form.password) body.password = form.password;
 
@@ -84,6 +87,7 @@ export default function DriversPage() {
       password: "",
       truckNumber: driver.truckNumber || "",
       phone: driver.phone || "",
+      autoLogoutMidnight: driver.autoLogoutMidnight,
     });
     setEditingId(driver.id);
     setShowForm(true);
@@ -201,6 +205,19 @@ export default function DriversPage() {
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             className="w-full h-12 rounded-lg bg-white px-4 text-slate-800 border border-slate-300 focus:border-amber-600 focus:outline-none"
           />
+          <label className="flex items-center justify-between px-1 cursor-pointer select-none">
+            <div>
+              <p className="text-sm font-medium text-slate-700">Auto-logout at midnight</p>
+              <p className="text-xs text-slate-400">Session ends automatically at 00:00</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm(f => ({ ...f, autoLogoutMidnight: !f.autoLogoutMidnight }))}
+              className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${form.autoLogoutMidnight ? "bg-amber-600" : "bg-slate-300"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.autoLogoutMidnight ? "translate-x-5" : ""}`} />
+            </button>
+          </label>
           <button
             onClick={handleSubmit}
             disabled={!form.name || !form.username || (!editingId && !form.password)}
