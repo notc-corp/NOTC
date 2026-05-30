@@ -79,10 +79,20 @@ export default function DriverLayout({
     <div className="min-h-screen bg-slate-50 text-slate-800">
       {/* Header */}
       <header className="bg-amber-600 border-b border-amber-700 px-4 py-3 flex items-center justify-between">
-        <Link href="/driver" className="flex items-center gap-2 text-xl font-bold text-white">
-          <img src="/logo.png" alt="" className="w-8 h-8" />
-          TruckAudit
-        </Link>
+        {pathname === "/driver" ? (
+          <Link href="/driver" className="flex items-center gap-2 text-xl font-bold text-white">
+            <img src="/logo.png" alt="" className="w-8 h-8" />
+            TruckAudit
+          </Link>
+        ) : (
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-1 text-white font-semibold text-lg active:opacity-70 -ml-1 px-1"
+          >
+            <span className="text-2xl leading-none">‹</span>
+            <span className="text-base">Back</span>
+          </button>
+        )}
         <div className="flex items-center gap-3">
           <span className="text-amber-100 text-sm">{user?.name}</span>
           <button
