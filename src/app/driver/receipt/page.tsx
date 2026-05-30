@@ -37,6 +37,21 @@ export default function ReceiptUpload() {
   const recognitionRef = useRef<unknown>(null);
   const router = useRouter();
 
+  // Editable form fields (pre-filled by OCR/voice, editable by driver)
+  const [editStation, setEditStation] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editTotal, setEditTotal] = useState("");
+  const [editGallons, setEditGallons] = useState("");
+  const [editPpg, setEditPpg] = useState("");
+
+  const populateForm = (data: ReceiptData) => {
+    setEditStation(data.station_name || "");
+    setEditDate(data.date || "");
+    setEditTotal(data.total != null ? String(data.total) : "");
+    setEditGallons(data.gallons != null ? String(data.gallons) : "");
+    setEditPpg(data.price_per_gallon != null ? String(data.price_per_gallon) : "");
+  };
+
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -49,6 +64,7 @@ export default function ReceiptUpload() {
       const res = await fetch("/api/ocr/receipt", { method: "POST", body: formData });
       const data = await res.json();
       setReceiptData(data);
+      populateForm(data);
       if (data.fuel_type || data.gallons) setCategory("fuel");
       setStep("confirm");
     } catch {
@@ -92,7 +108,7 @@ export default function ReceiptUpload() {
         const parsed = await res.json();
 
         if (parsed.confidence > 0.4) {
-          setReceiptData({
+          const data: ReceiptData = {
             station_name: parsed.description || null,
             date: null,
             fuel_type: parsed.category === "fuel" ? "diesel" : null,
@@ -101,7 +117,9 @@ export default function ReceiptUpload() {
             total: parsed.amount || null,
             confidence: parsed.confidence,
             notes: `Voice: "${text}"`,
-          });
+          };
+          setReceiptData(data);
+          populateForm(data);
           if (parsed.category) setCategory(parsed.category);
           setStep("confirm");
         }
@@ -125,12 +143,29 @@ export default function ReceiptUpload() {
   };
 
   const handleSave = async () => {
-    if (!photo && !receiptData) return;
     setSaving(true);
+    const totalVal = parseFloat(editTotal) || 0;
+    const gallonsVal = parseFloat(editGallons) || null;
+    const ppgVal = parseFloat(editPpg) || null;
+
+    const editedOcr = {
+      station_name: editStation || null,
+      date: editDate || null,
+      total: totalVal || null,
+      gallons: gallonsVal,
+      price_per_gallon: ppgVal,
+      confidence: receiptData?.confidence ?? null,
+      isManuallyEdited: receiptData ? (
+        editStation !== (receiptData.station_name || "") ||
+        editTotal !== (receiptData.total != null ? String(receiptData.total) : "") ||
+        editGallons !== (receiptData.gallons != null ? String(receiptData.gallons) : "")
+      ) : true,
+    };
+
     const formData = new FormData();
     if (photo) formData.append("photo", photo);
     formData.append("category", category);
-    if (receiptData) formData.append("ocrData", JSON.stringify(receiptData));
+    formData.append("ocrData", JSON.stringify(editedOcr));
     try {
       const res = await fetch("/api/expenses", { method: "POST", body: formData });
       if (res.ok) router.push("/driver");
@@ -144,6 +179,11 @@ export default function ReceiptUpload() {
     setPreview(null);
     setReceiptData(null);
     setVoiceText("");
+    setEditStation("");
+    setEditDate("");
+    setEditTotal("");
+    setEditGallons("");
+    setEditPpg("");
     setStep("capture");
   };
 
@@ -207,7 +247,7 @@ export default function ReceiptUpload() {
           </button>
 
           {voiceText && (
-            <p className="text-sm text-slate-500 text-center italic">"{voiceText}"</p>
+            <p className="text-sm text-slate-500 text-center italic">&quot;{voiceText}&quot;</p>
           )}
         </div>
       )}
@@ -222,45 +262,105 @@ export default function ReceiptUpload() {
       {step === "confirm" && !loading && (
         <div className="space-y-4">
           {preview && (
-            <img src={preview} alt="Receipt" className="w-full rounded-xl max-h-64 object-contain" />
+            <img src={preview} alt="Receipt" className="w-full rounded-xl max-h-56 object-contain border border-slate-200" />
           )}
 
+          {/* AI confidence badge */}
           {receiptData && (
-            <div className="bg-white rounded-xl p-4 space-y-3 border border-slate-200 shadow-sm">
-              {receiptData.notes?.startsWith("Voice:") && (
-                <p className="text-blue-600 text-sm font-medium">🎤 {receiptData.notes}</p>
-              )}
-              {receiptData.station_name && (
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Location</span>
-                  <span className="font-medium text-slate-800">{receiptData.station_name}</span>
-                </div>
-              )}
-              {receiptData.gallons && (
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Gallons</span>
-                  <span className="font-medium text-slate-800">{receiptData.gallons.toFixed(2)}</span>
-                </div>
-              )}
-              {receiptData.price_per_gallon && (
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Price/Gallon</span>
-                  <span className="font-medium text-slate-800">${receiptData.price_per_gallon.toFixed(3)}</span>
-                </div>
-              )}
-              {receiptData.total && (
-                <div className="flex justify-between border-t border-slate-200 pt-3">
-                  <span className="text-slate-500 font-medium">Total</span>
-                  <span className="text-2xl font-bold text-green-600">${receiptData.total.toFixed(2)}</span>
-                </div>
-              )}
-              {receiptData.confidence < 0.7 && (
-                <p className="text-yellow-600 text-sm">⚠️ Low confidence — please verify the amounts</p>
-              )}
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+              receiptData.confidence >= 0.8
+                ? "bg-green-50 text-green-700"
+                : receiptData.confidence >= 0.5
+                ? "bg-amber-50 text-amber-700"
+                : "bg-red-50 text-red-700"
+            }`}>
+              <span>{receiptData.confidence >= 0.8 ? "✓" : "⚠️"}</span>
+              <span>
+                {receiptData.notes?.startsWith("Voice:")
+                  ? receiptData.notes
+                  : receiptData.confidence >= 0.8
+                  ? "AI read this receipt — verify the fields below"
+                  : receiptData.confidence >= 0.5
+                  ? "Low confidence — please check the fields"
+                  : "Couldn't read clearly — enter manually"}
+              </span>
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Editable form */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+            {/* Station */}
+            <div className="px-4 py-3">
+              <label className="text-xs text-slate-500 font-medium uppercase tracking-wide">Station / Merchant</label>
+              <input
+                type="text"
+                value={editStation}
+                onChange={e => setEditStation(e.target.value)}
+                placeholder="e.g. Shell, Pilot, TA"
+                className="w-full mt-1 h-10 rounded-lg border border-slate-200 px-3 text-slate-800 text-base focus:border-amber-500 focus:outline-none bg-slate-50"
+              />
+            </div>
+
+            {/* Date */}
+            <div className="px-4 py-3">
+              <label className="text-xs text-slate-500 font-medium uppercase tracking-wide">Date</label>
+              <input
+                type="date"
+                value={editDate}
+                onChange={e => setEditDate(e.target.value)}
+                className="w-full mt-1 h-10 rounded-lg border border-slate-200 px-3 text-slate-800 text-base focus:border-amber-500 focus:outline-none bg-slate-50"
+              />
+            </div>
+
+            {/* Total */}
+            <div className="px-4 py-3">
+              <label className="text-xs text-slate-500 font-medium uppercase tracking-wide">Total Amount ($)</label>
+              <input
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min="0"
+                value={editTotal}
+                onChange={e => setEditTotal(e.target.value)}
+                placeholder="0.00"
+                className="w-full mt-1 h-10 rounded-lg border border-slate-200 px-3 text-slate-800 text-base focus:border-amber-500 focus:outline-none bg-slate-50"
+              />
+            </div>
+
+            {/* Gallons + PPG — only for fuel */}
+            {category === "fuel" && (
+              <div className="px-4 py-3 grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-slate-500 font-medium uppercase tracking-wide">Gallons</label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.001"
+                    min="0"
+                    value={editGallons}
+                    onChange={e => setEditGallons(e.target.value)}
+                    placeholder="0.000"
+                    className="w-full mt-1 h-10 rounded-lg border border-slate-200 px-3 text-slate-800 text-base focus:border-amber-500 focus:outline-none bg-slate-50"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500 font-medium uppercase tracking-wide">$/Gallon</label>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    step="0.001"
+                    min="0"
+                    value={editPpg}
+                    onChange={e => setEditPpg(e.target.value)}
+                    placeholder="0.000"
+                    className="w-full mt-1 h-10 rounded-lg border border-slate-200 px-3 text-slate-800 text-base focus:border-amber-500 focus:outline-none bg-slate-50"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-1">
             <button
               onClick={handleRetake}
               className="h-14 rounded-xl bg-slate-100 text-slate-800 text-lg font-medium active:bg-slate-200 border border-slate-200"
