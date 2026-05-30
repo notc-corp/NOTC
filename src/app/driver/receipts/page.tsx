@@ -48,13 +48,36 @@ export default function ReceiptScanPage() {
 
   // --- Photo capture ---
 
-  const handlePhotoAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Compress image to max 1200px / JPEG 80% to stay under Vercel 4.5 MB body limit
+  const compressImage = (file: File): Promise<File> =>
+    new Promise(resolve => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX = 1200;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(blob => {
+          resolve(blob ? new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" }) : file);
+        }, "image/jpeg", 0.80);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+
+  const handlePhotoAdd = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-    setPhotos(prev => [...prev, ...files]);
-    setPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
-    // Reset input so same file can be re-added
     e.target.value = "";
+    const compressed = await Promise.all(files.map(compressImage));
+    setPhotos(prev => [...prev, ...compressed]);
+    setPreviews(prev => [...prev, ...compressed.map(f => URL.createObjectURL(f))]);
   };
 
   const removePhoto = (index: number) => {
@@ -113,8 +136,8 @@ export default function ReceiptScanPage() {
         ...scanned,
       ]);
       setStep("review");
-    } catch {
-      setError("Ошибка анализа. Проверь соединение и попробуй снова.");
+    } catch (err) {
+      setError(`Ошибка анализа: ${err instanceof Error ? err.message : "Проверь соединение и попробуй снова."}`);
       setStep("capture");
     }
   };
