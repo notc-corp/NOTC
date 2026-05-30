@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, hashPin } from "@/lib/auth";
+import { getSession, hashPassword } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -17,6 +17,7 @@ export async function GET() {
     .select({
       id: users.id,
       name: users.name,
+      username: users.username,
       role: users.role,
       truckNumber: users.truckNumber,
       phone: users.phone,
@@ -35,28 +36,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 
-  const { name, pin, truckNumber, phone } = await req.json();
+  const { name, username, password, truckNumber, phone } = await req.json();
 
-  if (!name || !pin) {
+  if (!name || !username || !password) {
     return NextResponse.json(
-      { error: "Name and PIN are required" },
+      { error: "Name, username and password are required" },
       { status: 400 }
     );
   }
 
-  if (pin.length < 4 || pin.length > 6) {
+  if (password.length < 4) {
     return NextResponse.json(
-      { error: "PIN must be 4-6 digits" },
+      { error: "Password must be at least 4 characters" },
       { status: 400 }
     );
   }
 
-  const pinHash = await hashPin(pin);
+  const pinHash = await hashPassword(password);
 
   const [result] = await db
     .insert(users)
     .values({
       name,
+      username: username.trim().toLowerCase(),
       role: "driver",
       pinHash,
       truckNumber: truckNumber || null,

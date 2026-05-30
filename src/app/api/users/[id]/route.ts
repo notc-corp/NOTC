@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, hashPin } from "@/lib/auth";
+import { getSession, hashPassword } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -28,10 +28,11 @@ export async function PATCH(
   const updates: Record<string, unknown> = {};
 
   if (body.name !== undefined) updates.name = body.name;
+  if (body.username !== undefined) updates.username = body.username.trim().toLowerCase();
   if (body.truckNumber !== undefined) updates.truckNumber = body.truckNumber;
   if (body.phone !== undefined) updates.phone = body.phone;
   if (body.isActive !== undefined) updates.isActive = body.isActive;
-  if (body.pin) updates.pinHash = await hashPin(body.pin);
+  if (body.password) updates.pinHash = await hashPassword(body.password);
 
   const [result] = await db
     .update(users)

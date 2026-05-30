@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 interface Driver {
   id: number;
   name: string;
+  username: string | null;
   truckNumber: string | null;
   phone: string | null;
   isActive: boolean;
@@ -17,7 +18,8 @@ export default function DriversPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
     name: "",
-    pin: "",
+    username: "",
+    password: "",
     truckNumber: "",
     phone: "",
   });
@@ -36,21 +38,22 @@ export default function DriversPage() {
   }, []);
 
   const resetForm = () => {
-    setForm({ name: "", pin: "", truckNumber: "", phone: "" });
+    setForm({ name: "", username: "", password: "", truckNumber: "", phone: "" });
     setShowForm(false);
     setEditingId(null);
   };
 
   const handleSubmit = async () => {
-    if (!form.name || (!editingId && !form.pin)) return;
+    if (!form.name || !form.username || (!editingId && !form.password)) return;
 
     if (editingId) {
       const body: Record<string, string> = {
         name: form.name,
+        username: form.username,
         truckNumber: form.truckNumber,
         phone: form.phone,
       };
-      if (form.pin) body.pin = form.pin;
+      if (form.password) body.password = form.password;
 
       await fetch(`/api/users/${editingId}`, {
         method: "PATCH",
@@ -72,7 +75,8 @@ export default function DriversPage() {
   const handleEdit = (driver: Driver) => {
     setForm({
       name: driver.name,
-      pin: "",
+      username: driver.username || "",
+      password: "",
       truckNumber: driver.truckNumber || "",
       phone: driver.phone || "",
     });
@@ -116,30 +120,32 @@ export default function DriversPage() {
           </h2>
           <input
             type="text"
-            placeholder="Driver name"
+            placeholder="Driver full name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="w-full h-12 rounded-lg bg-white px-4 text-slate-800 border border-slate-300 focus:border-amber-600 focus:outline-none"
           />
           <input
             type="text"
-            placeholder={editingId ? "New PIN (leave blank to keep)" : "4-6 digit PIN"}
-            value={form.pin}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                pin: e.target.value.replace(/\D/g, "").slice(0, 6),
-              })
-            }
+            autoCapitalize="none"
+            autoCorrect="off"
+            placeholder="Username (e.g. john.smith)"
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value.toLowerCase().replace(/\s+/g, ".") })}
+            className="w-full h-12 rounded-lg bg-white px-4 text-slate-800 border border-slate-300 focus:border-amber-600 focus:outline-none"
+          />
+          <input
+            type="password"
+            placeholder={editingId ? "New password (leave blank to keep)" : "Password (min 4 characters)"}
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
             className="w-full h-12 rounded-lg bg-white px-4 text-slate-800 border border-slate-300 focus:border-amber-600 focus:outline-none"
           />
           <input
             type="text"
             placeholder="Truck number (optional)"
             value={form.truckNumber}
-            onChange={(e) =>
-              setForm({ ...form, truckNumber: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, truckNumber: e.target.value })}
             className="w-full h-12 rounded-lg bg-white px-4 text-slate-800 border border-slate-300 focus:border-amber-600 focus:outline-none"
           />
           <input
@@ -151,7 +157,7 @@ export default function DriversPage() {
           />
           <button
             onClick={handleSubmit}
-            disabled={!form.name || (!editingId && !form.pin)}
+            disabled={!form.name || !form.username || (!editingId && !form.password)}
             className="w-full h-12 rounded-lg bg-green-600 text-white font-bold disabled:opacity-40 active:bg-green-700"
           >
             {editingId ? "Save Changes" : "Add Driver"}
@@ -176,6 +182,7 @@ export default function DriversPage() {
               <div>
                 <p className="font-medium text-lg text-slate-800">{driver.name}</p>
                 <div className="flex gap-3 text-sm text-slate-500">
+                  {driver.username && <span>@{driver.username}</span>}
                   {driver.truckNumber && <span>🚛 {driver.truckNumber}</span>}
                   {driver.phone && <span>📱 {driver.phone}</span>}
                   {!driver.isActive && (

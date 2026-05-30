@@ -2,7 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 import bcryptjs from "bcryptjs";
-import { eq, isNull } from "drizzle-orm";
+import { eq, isNull, and } from "drizzle-orm";
 
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL;
@@ -32,6 +32,14 @@ async function seed() {
     console.log(`Assigned company to user: ${user.name}`);
   }
 
+  // Migrate existing users without username
+  const withoutUsername = await db.select().from(schema.users).where(isNull(schema.users.username));
+  for (const user of withoutUsername) {
+    const username = user.name.toLowerCase().replace(/\s+/g, ".");
+    await db.update(schema.users).set({ username }).where(eq(schema.users.id, user.id));
+    console.log(`Set username '${username}' for user: ${user.name}`);
+  }
+
   const existing = await db.select().from(schema.users);
   const hasOwner = existing.some((u) => u.role === "owner");
 
@@ -39,12 +47,13 @@ async function seed() {
     const ownerPinHash = await bcryptjs.hash("1234", 10);
     await db.insert(schema.users).values({
       name: "Owner",
+      username: "owner",
       role: "owner",
       pinHash: ownerPinHash,
       companyId: company.id,
     });
-    console.log("Created owner account (PIN: 1234)");
-    console.log("CHANGE THIS PIN after first login!");
+    console.log("Created owner account (username: owner, password: 1234)");
+    console.log("CHANGE THIS PASSWORD after first login!");
   } else {
     console.log("Owner account already exists, skipping.");
   }
@@ -54,12 +63,13 @@ async function seed() {
     const driverPinHash = await bcryptjs.hash("5678", 10);
     await db.insert(schema.users).values({
       name: "Test Driver",
+      username: "driver1",
       role: "driver",
       pinHash: driverPinHash,
       truckNumber: "Truck 01",
       companyId: company.id,
     });
-    console.log("Created test driver (PIN: 5678, Truck 01)");
+    console.log("Created test driver (username: driver1, password: 5678, Truck 01)");
   }
 
   console.log("\nSeed complete!");

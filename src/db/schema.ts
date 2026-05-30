@@ -28,6 +28,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   companyId: integer("company_id").references(() => companies.id),
   name: text("name").notNull(),
+  username: text("username").unique(),
   role: text("role", { enum: ["owner", "driver"] }).notNull(),
   pinHash: text("pin_hash").notNull(),
   truckNumber: text("truck_number"),

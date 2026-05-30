@@ -4,26 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [pin, setPin] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleDigit = (digit: string) => {
-    if (pin.length < 6) {
-      setPin((prev) => prev + digit);
-      setError("");
-    }
-  };
-
-  const handleBackspace = () => {
-    setPin((prev) => prev.slice(0, -1));
-    setError("");
-  };
-
-  const handleSubmit = async () => {
-    if (pin.length < 4) {
-      setError("Enter at least 4 digits");
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!username.trim() || !password) {
+      setError("Enter username and password");
       return;
     }
     setLoading(true);
@@ -33,12 +23,12 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ username: username.trim(), password }),
       });
 
       if (!res.ok) {
-        setError("Wrong PIN. Try again.");
-        setPin("");
+        setError("Invalid username or password");
+        setPassword("");
         setLoading(false);
         return;
       }
@@ -55,69 +45,58 @@ export default function LoginPage() {
     }
   };
 
-  const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", ""];
-
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <img src="/logo.png" alt="TruckAudit" className="w-24 h-24 mx-auto mb-3" />
           <h1 className="text-3xl font-bold text-slate-900">TruckAudit</h1>
-          <p className="text-slate-500 mt-1">Enter your PIN</p>
+          <p className="text-slate-500 mt-1">Sign in to your account</p>
         </div>
 
-        <div className="flex justify-center gap-3 mb-6">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className={`w-4 h-4 rounded-full border-2 ${
-                i < pin.length
-                  ? "bg-amber-600 border-amber-600"
-                  : "border-slate-300"
-              }`}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Username
+            </label>
+            <input
+              type="text"
+              autoCapitalize="none"
+              autoCorrect="off"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => { setUsername(e.target.value); setError(""); }}
+              placeholder="e.g. john.smith"
+              className="w-full h-12 rounded-xl border border-slate-300 px-4 text-slate-800 text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
-          ))}
-        </div>
+          </div>
 
-        {error && (
-          <p className="text-red-500 text-center mb-4 text-lg font-medium">
-            {error}
-          </p>
-        )}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(""); }}
+              placeholder="••••••••"
+              className="w-full h-12 rounded-xl border border-slate-300 px-4 text-slate-800 text-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            />
+          </div>
 
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          {digits.map((digit, i) => {
-            if (digit === "") {
-              if (i === 9) return <div key={i} />;
-              return (
-                <button
-                  key={i}
-                  onPointerDown={handleBackspace}
-                  className="h-16 rounded-xl bg-slate-100 text-slate-800 text-2xl font-bold active:bg-slate-200 transition-colors flex items-center justify-center"
-                >
-                  ←
-                </button>
-              );
-            }
-            return (
-              <button
-                key={i}
-                onPointerDown={() => handleDigit(digit)}
-                className="h-16 rounded-xl bg-slate-100 text-slate-800 text-2xl font-bold active:bg-slate-200 transition-colors"
-              >
-                {digit}
-              </button>
-            );
-          })}
-        </div>
+          {error && (
+            <p className="text-red-500 text-center text-sm font-medium">{error}</p>
+          )}
 
-        <button
-          onPointerDown={handleSubmit}
-          disabled={loading || pin.length < 4}
-          className="w-full h-16 rounded-xl bg-amber-600 text-white text-xl font-bold disabled:opacity-40 active:bg-amber-700 transition-colors"
-        >
-          {loading ? "Checking..." : "GO"}
-        </button>
+          <button
+            type="submit"
+            disabled={loading || !username.trim() || !password}
+            className="w-full h-12 rounded-xl bg-amber-600 text-white text-lg font-bold disabled:opacity-40 active:bg-amber-700 transition-colors mt-2"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
       </div>
 
       <footer className="mt-8 text-center text-sm text-slate-400 pb-4">

@@ -42,3 +42,6 @@ export async function verifyPin(
 ): Promise<boolean> {
   return bcryptjs.compare(pin, hash);
 }
+
+export const hashPassword = hashPin;
+export const verifyPassword = verifyPin;

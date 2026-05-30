@@ -1,33 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
-import { getSession, verifyPin } from "@/lib/auth";
+import { getSession, verifyPassword } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
-    const { pin } = await req.json();
+    const { username, password } = await req.json();
 
-    if (!pin || typeof pin !== "string") {
-      return NextResponse.json({ error: "PIN is required" }, { status: 400 });
+    if (!username || !password || typeof username !== "string" || typeof password !== "string") {
+      return NextResponse.json({ error: "Username and password are required" }, { status: 400 });
     }
 
-    // Find active user by checking all PINs
-    const allUsers = await db
+    const [matchedUser] = await db
       .select()
       .from(users)
-      .where(eq(users.isActive, true));
+      .where(eq(users.username, username.trim().toLowerCase()));
 
-    let matchedUser = null;
-    for (const user of allUsers) {
-      if (await verifyPin(pin, user.pinHash)) {
-        matchedUser = user;
-        break;
-      }
+    if (!matchedUser || !matchedUser.isActive) {
+      return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
-    if (!matchedUser) {
-      return NextResponse.json({ error: "Invalid PIN" }, { status: 401 });
+    const valid = await verifyPassword(password, matchedUser.pinHash);
+    if (!valid) {
+      return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
     }
 
     const session = await getSession();
@@ -44,9 +40,6 @@ export async function POST(req: NextRequest) {
       companyId: matchedUser.companyId,
     });
   } catch {
-    return NextResponse.json(
-      { error: "Login failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }
