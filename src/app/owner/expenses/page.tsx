@@ -35,6 +35,7 @@ export default function ExpensesPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
+  const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisDays, setAnalysisDays] = useState(30);
@@ -119,6 +120,16 @@ export default function ExpensesPage() {
   }
 
   return (
+    <>
+    {viewingPhoto && (
+      <div
+        className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+        onClick={() => setViewingPhoto(null)}
+      >
+        <img src={viewingPhoto} alt="Receipt" className="max-w-full max-h-full rounded-xl object-contain" />
+        <button className="absolute top-4 right-4 text-white text-3xl leading-none">×</button>
+      </div>
+    )}
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Expenses</h1>
@@ -268,19 +279,19 @@ export default function ExpensesPage() {
               key={exp.id}
               className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-2xl shrink-0">
                     {categoryIcons[exp.category] || "📋"}
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium text-slate-800">
                       {getDriverName(exp.driverId)}{" "}
                       <span className="text-slate-500 capitalize text-sm">
                         — {exp.category}
                       </span>
                     </p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500 truncate">
                       {exp.stationName || exp.description || ""}
                       {exp.gallons &&
                         ` · ${exp.gallons.toFixed(1)} gal`}
@@ -290,21 +301,35 @@ export default function ExpensesPage() {
                     <p className="text-xs text-slate-400">
                       {new Date(exp.createdAt).toLocaleString()}
                       {exp.isManuallyEdited && (
-                        <span className="ml-2 text-yellow-600">
-                          (edited)
-                        </span>
+                        <span className="ml-2 text-yellow-600">(edited)</span>
                       )}
                     </p>
                   </div>
                 </div>
-                <span className="text-lg font-bold text-slate-800">
-                  {formatDollars(exp.amountCents)}
-                </span>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-lg font-bold text-slate-800">
+                    {formatDollars(exp.amountCents)}
+                  </span>
+                  {exp.receiptPath ? (
+                    <button onClick={() => setViewingPhoto(exp.receiptPath!)}>
+                      <img
+                        src={exp.receiptPath}
+                        alt="receipt"
+                        className="w-14 h-14 rounded-lg object-cover border border-slate-200 hover:opacity-80 transition-opacity"
+                      />
+                    </button>
+                  ) : (
+                    <div className="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300 text-xl">
+                      📄
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
     </div>
+    </>
   );
 }

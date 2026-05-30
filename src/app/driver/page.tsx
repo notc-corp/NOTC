@@ -16,6 +16,7 @@ interface Expense {
   category: string;
   amountCents: number;
   description: string | null;
+  receiptPath: string | null;
   createdAt: string;
 }
 
@@ -25,6 +26,7 @@ export default function DriverDashboard() {
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [todayExpenses, setTodayExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
   const [gpsStatus, setGpsStatus] = useState<"off" | "active" | "error">("off");
   const [currentSpeed, setCurrentSpeed] = useState<number | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -122,6 +124,16 @@ export default function DriverDashboard() {
   }
 
   return (
+    <>
+    {viewingPhoto && (
+      <div
+        className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+        onClick={() => setViewingPhoto(null)}
+      >
+        <img src={viewingPhoto} alt="Receipt" className="max-w-full max-h-full rounded-xl object-contain" />
+        <button className="absolute top-4 right-4 text-white text-3xl leading-none">×</button>
+      </div>
+    )}
     <div className="space-y-6">
       {/* Trip Status */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -207,14 +219,33 @@ export default function DriverDashboard() {
                     )}
                   </div>
                 </div>
-                <span className="text-lg font-bold text-slate-800">
-                  {formatDollars(exp.amountCents)}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-bold text-slate-800">
+                    {formatDollars(exp.amountCents)}
+                  </span>
+                  {exp.receiptPath ? (
+                    <button
+                      onClick={() => setViewingPhoto(exp.receiptPath!)}
+                      className="shrink-0"
+                    >
+                      <img
+                        src={exp.receiptPath}
+                        alt="receipt"
+                        className="w-12 h-12 rounded-lg object-cover border border-slate-200"
+                      />
+                    </button>
+                  ) : (
+                    <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300 text-xl shrink-0">
+                      📄
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
     </div>
+    </>
   );
 }
