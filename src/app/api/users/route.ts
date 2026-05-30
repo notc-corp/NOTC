@@ -23,6 +23,8 @@ export async function GET() {
       phone: users.phone,
       isActive: users.isActive,
       createdAt: users.createdAt,
+      lockedUntil: users.lockedUntil,
+      failedAttempts: users.failedAttempts,
     })
     .from(users)
     .where(and(...conditions));

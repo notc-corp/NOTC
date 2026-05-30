@@ -60,6 +60,25 @@ export async function notifyTripCompleted(opts: {
   );
 }
 
+export async function notifyLoginBlocked(opts: {
+  companyId: number | null | undefined;
+  driverName: string;
+  username: string;
+  lockDurationMins: number;
+}) {
+  const chatId = await getChatId(opts.companyId);
+  if (!chatId) return;
+
+  const duration = opts.lockDurationMins >= 60
+    ? `${opts.lockDurationMins / 60} hour(s)`
+    : `${opts.lockDurationMins} minutes`;
+
+  await sendTelegram(
+    chatId,
+    `🔒 <b>Account locked</b>\nDriver: ${opts.driverName} (@${opts.username})\n5 wrong PIN attempts — blocked for ${duration}.\nUnlock in the Drivers panel if needed.`
+  );
+}
+
 export async function notifyAnomaly(opts: {
   companyId: number | null | undefined;
   driverName: string;

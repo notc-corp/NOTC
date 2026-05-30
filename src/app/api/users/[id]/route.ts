@@ -33,6 +33,10 @@ export async function PATCH(
   if (body.phone !== undefined) updates.phone = body.phone;
   if (body.isActive !== undefined) updates.isActive = body.isActive;
   if (body.password) updates.pinHash = await hashPassword(body.password);
+  if (body.unlock === true) {
+    updates.lockedUntil = null;
+    updates.failedAttempts = 0;
+  }
 
   const [result] = await db
     .update(users)

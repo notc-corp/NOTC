@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [locked, setLocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -19,6 +20,7 @@ export default function LoginPage() {
     }
     setLoading(true);
     setError("");
+    setLocked(false);
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -28,7 +30,16 @@ export default function LoginPage() {
       });
 
       if (!res.ok) {
-        setError("Invalid username or password");
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 423) {
+          const mins = data.secsRemaining ? Math.ceil(data.secsRemaining / 60) : "?";
+          setError(`Account locked. Try again in ${mins} min or contact your manager.`);
+          setLocked(true);
+        } else if (data.attemptsLeft != null && data.attemptsLeft <= 2) {
+          setError(`Wrong password. ${data.attemptsLeft} attempt${data.attemptsLeft !== 1 ? "s" : ""} left before lockout.`);
+        } else {
+          setError("Invalid username or password");
+        }
         setPassword("");
         setLoading(false);
         return;
@@ -87,7 +98,9 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-red-500 text-center text-sm font-medium">{error}</p>
+            <p className={`text-center text-sm font-medium ${locked ? "text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2" : "text-red-500"}`}>
+              {locked ? "🔒 " : ""}{error}
+            </p>
           )}
 
           <button

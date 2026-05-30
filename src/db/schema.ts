@@ -35,6 +35,9 @@ export const users = pgTable("users", {
   phone: text("phone"),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
+  failedAttempts: integer("failed_attempts").notNull().default(0),
+  lockedUntil: text("locked_until"),
+  lockLevel: integer("lock_level").notNull().default(0),
 });
 
 export const trips = pgTable("trips", {

@@ -9,6 +9,8 @@ interface Driver {
   truckNumber: string | null;
   phone: string | null;
   isActive: boolean;
+  lockedUntil: string | null;
+  failedAttempts: number;
 }
 
 export default function DriversPage() {
@@ -24,6 +26,7 @@ export default function DriversPage() {
     phone: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [unlocking, setUnlocking] = useState<number | null>(null);
 
   const loadDrivers = () => {
     fetch("/api/users")
@@ -93,6 +96,28 @@ export default function DriversPage() {
       body: JSON.stringify({ isActive: !driver.isActive }),
     });
     loadDrivers();
+  };
+
+  const handleUnlock = async (driver: Driver) => {
+    setUnlocking(driver.id);
+    await fetch(`/api/users/${driver.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ unlock: true }),
+    });
+    setUnlocking(null);
+    loadDrivers();
+  };
+
+  const isLocked = (driver: Driver) =>
+    !!driver.lockedUntil && new Date(driver.lockedUntil) > new Date();
+
+  const lockTimeRemaining = (lockedUntil: string) => {
+    const secsLeft = Math.ceil((new Date(lockedUntil).getTime() - Date.now()) / 1000);
+    if (secsLeft <= 0) return "";
+    if (secsLeft < 60) return `${secsLeft}s`;
+    if (secsLeft < 3600) return `${Math.ceil(secsLeft / 60)}m`;
+    return `${Math.ceil(secsLeft / 3600)}h`;
   };
 
   if (loading) {
@@ -193,44 +218,71 @@ export default function DriversPage() {
             No drivers yet. Add your first driver above.
           </p>
         ) : (
-          drivers.map((driver) => (
-            <div
-              key={driver.id}
-              className={`bg-white rounded-xl p-4 flex items-center justify-between border border-slate-200 shadow-sm ${
-                !driver.isActive ? "opacity-50" : ""
-              }`}
-            >
-              <div>
-                <p className="font-medium text-lg text-slate-800">{driver.name}</p>
-                <div className="flex gap-3 text-sm text-slate-500">
-                  {driver.username && <span>@{driver.username}</span>}
-                  {driver.truckNumber && <span>🚛 {driver.truckNumber}</span>}
-                  {driver.phone && <span>📱 {driver.phone}</span>}
-                  {!driver.isActive && (
-                    <span className="text-red-500">Inactive</span>
-                  )}
+          drivers.map((driver) => {
+            const locked = isLocked(driver);
+            return (
+              <div
+                key={driver.id}
+                className={`bg-white rounded-xl p-4 border shadow-sm ${
+                  locked
+                    ? "border-red-300 bg-red-50"
+                    : !driver.isActive
+                    ? "border-slate-200 opacity-50"
+                    : "border-slate-200"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-lg text-slate-800">{driver.name}</p>
+                      {locked && (
+                        <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-medium">
+                          🔒 {lockTimeRemaining(driver.lockedUntil!)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-3 text-sm text-slate-500 mt-0.5">
+                      {driver.username && <span>@{driver.username}</span>}
+                      {driver.truckNumber && <span>🚛 {driver.truckNumber}</span>}
+                      {driver.phone && <span>📱 {driver.phone}</span>}
+                      {!driver.isActive && <span className="text-red-500">Inactive</span>}
+                      {!locked && driver.failedAttempts > 0 && (
+                        <span className="text-amber-600">⚠️ {driver.failedAttempts} bad attempt{driver.failedAttempts > 1 ? "s" : ""}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    {locked ? (
+                      <button
+                        onClick={() => handleUnlock(driver)}
+                        disabled={unlocking === driver.id}
+                        className="px-3 py-1.5 rounded-lg bg-green-600 text-white text-sm font-medium active:bg-green-700 disabled:opacity-50"
+                      >
+                        {unlocking === driver.id ? "..." : "🔓 Unlock"}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleEdit(driver)}
+                        className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm active:bg-slate-200 border border-slate-200"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleToggleActive(driver)}
+                      className={`px-3 py-1.5 rounded-lg text-sm text-white ${
+                        driver.isActive
+                          ? "bg-red-600 active:bg-red-700"
+                          : "bg-green-600 active:bg-green-700"
+                      }`}
+                    >
+                      {driver.isActive ? "Deactivate" : "Activate"}
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(driver)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm active:bg-slate-200 border border-slate-200"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleToggleActive(driver)}
-                  className={`px-3 py-1.5 rounded-lg text-sm text-white ${
-                    driver.isActive
-                      ? "bg-red-600 active:bg-red-700"
-                      : "bg-green-600 active:bg-green-700"
-                  }`}
-                >
-                  {driver.isActive ? "Deactivate" : "Activate"}
-                </button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
