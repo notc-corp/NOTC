@@ -59,13 +59,15 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         {children}
-        <Script id="sw-register" strategy="afterInteractive">
-          {`
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.register('/sw.js').catch(console.error);
-            }
-          `}
-        </Script>
+        {process.env.NODE_ENV === "production" && (
+          <Script id="sw-register" strategy="afterInteractive">
+            {`
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(console.error);
+              }
+            `}
+          </Script>
+        )}
       </body>
     </html>
   );
