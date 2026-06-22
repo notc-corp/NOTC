@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { defects, trips } from "@/db/schema";
+import { defects, trips, users } from "@/db/schema";
 import { saveUpload } from "@/lib/upload";
 import { eq, and, desc, isNull } from "drizzle-orm";
 
@@ -17,7 +17,21 @@ export async function GET(req: NextRequest) {
   if (session.role === "driver") conditions.push(eq(defects.driverId, session.userId));
   if (onlyOpen) conditions.push(isNull(defects.resolvedAt));
 
-  const results = await db.select().from(defects)
+  const results = await db
+    .select({
+      id: defects.id,
+      driverId: defects.driverId,
+      driverName: users.name,
+      tripId: defects.tripId,
+      description: defects.description,
+      severity: defects.severity,
+      photoPath: defects.photoPath,
+      resolvedAt: defects.resolvedAt,
+      resolvedBy: defects.resolvedBy,
+      createdAt: defects.createdAt,
+    })
+    .from(defects)
+    .innerJoin(users, eq(defects.driverId, users.id))
     .where(conditions.length ? and(...conditions) : undefined)
     .orderBy(desc(defects.createdAt));
 

@@ -27,6 +27,7 @@ interface DefectNote {
 interface Downtime {
   id: number;
   driverId: number;
+  driverName?: string;
   tripId: number | null;
   reason: string | null;
   startedAt: string;
@@ -258,7 +259,7 @@ export default function DefectsPage() {
           {activeDowntime.map(dt => (
             <div key={dt.id} className="bg-red-600 text-white rounded-xl p-4 flex items-center justify-between">
               <div>
-                <p className="font-bold">🚫 Active Downtime — Driver #{dt.driverId}</p>
+                <p className="font-bold">🚫 Active Downtime — {dt.driverName || `Driver #${dt.driverId}`}</p>
                 <p className="text-sm text-red-100 mt-0.5">
                   {dt.reason || "No reason given"} · {getDuration(dt.startedAt, null)} elapsed
                 </p>
@@ -315,7 +316,7 @@ export default function DefectsPage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-500">
-                    Driver #{d.driverId}{d.tripId ? ` · Trip #${d.tripId}` : ""}
+                    {d.driverName || `Driver #${d.driverId}`}{d.tripId ? ` · Trip #${d.tripId}` : ""}
                   </span>
                   <div className="flex gap-2">
                     <button

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 interface Inspection {
   id: number;
   driverId: number;
+  driverName: string;
   tripId: number | null;
   type: "pre" | "post";
   safeToOperate: boolean | null;
@@ -73,7 +74,7 @@ export default function InspectionsPage() {
                 </span>
               </div>
               <div className="text-sm text-slate-600">
-                Driver #{insp.driverId}
+                {insp.driverName}
                 {insp.tripId && <span className="ml-2 text-slate-400">· Trip #{insp.tripId}</span>}
               </div>
               <div className="mt-1 text-sm font-medium">

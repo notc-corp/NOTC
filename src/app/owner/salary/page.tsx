@@ -85,7 +85,7 @@ export default function OwnerSalaryPage() {
   useEffect(() => { loadAll(); }, []);
 
   const handleSetRate = async (driverId: number) => {
-    const cents = parseInt(rateForm.rateCents);
+    const cents = Math.round(parseFloat(rateForm.rateCents) * 100);
     if (!cents || cents <= 0) return;
     setSubmitting(true);
     await fetch(`/api/salary/rates/${driverId}`, {

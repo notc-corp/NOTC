@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -12,11 +12,24 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get("type");
 
   const allInspections = await db
-    .select()
+    .select({
+      id: schema.inspections.id,
+      driverId: schema.inspections.driverId,
+      driverName: schema.users.name,
+      tripId: schema.inspections.tripId,
+      type: schema.inspections.type,
+      safeToOperate: schema.inspections.safeToOperate,
+      hasDefects: schema.inspections.hasDefects,
+      hasOutOfService: schema.inspections.hasOutOfService,
+      completedAt: schema.inspections.completedAt,
+      companyId: schema.users.companyId,
+    })
     .from(schema.inspections)
+    .innerJoin(schema.users, eq(schema.inspections.driverId, schema.users.id))
     .orderBy(desc(schema.inspections.completedAt));
 
   const filtered = allInspections.filter((i) => {
+    if (session.companyId && i.companyId !== session.companyId) return false;
     if (session.role === "driver" && i.driverId !== session.userId) return false;
     if (tripId && i.tripId !== parseInt(tripId)) return false;
     if (type && i.type !== type) return false;

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { salaryPayments, salaryEntries } from "@/db/schema";
+import { salaryPayments, salaryEntries, users } from "@/db/schema";
 import { eq, isNull, and, desc } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
@@ -43,10 +43,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "driverId and amountCents required" }, { status: 400 });
   }
 
+  // Get companyId from driver record
+  const [driver] = await db.select({ companyId: users.companyId }).from(users).where(eq(users.id, driverId));
+
   // Create payment
   const [payment] = await db
     .insert(salaryPayments)
     .values({
+      companyId: driver?.companyId ?? null,
       driverId,
       amountCents,
       notes: notes || null,
