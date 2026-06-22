@@ -41,6 +41,7 @@ export const users = pgTable("users", {
   autoLogoutMidnight: boolean("auto_logout_midnight").notNull().default(true),
   ledgerEnabled: boolean("ledger_enabled").notNull().default(false),
   ledgerFeePercent: real("ledger_fee_percent").notNull().default(12),
+  preTripInspectionEnabled: boolean("pre_trip_inspection_enabled").notNull().default(true),
 });
 
 export const trips = pgTable("trips", {
@@ -205,6 +206,14 @@ export const ledgerEntries = pgTable("ledger_entries", {
   cashExpenseCents: integer("cash_expense_cents"),
   cashExpenseNote: text("cash_expense_note"),
   createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
+});
+
+export const ledgerWeeklyPayments = pgTable("ledger_weekly_payments", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").references(() => companies.id),
+  driverId: integer("driver_id").notNull().references(() => users.id),
+  weekStart: text("week_start").notNull(),
+  paidAt: text("paid_at").notNull().$default(() => new Date().toISOString()),
 });
 
 export const salaryEntries = pgTable("salary_entries", {

@@ -23,6 +23,51 @@ interface LedgerEntry {
 const fmt = (cents: number | null) => (cents == null ? "—" : `$${(cents / 100).toFixed(2)}`);
 const today = () => new Date().toISOString().slice(0, 10);
 
+// Weeks run Sunday–Saturday.
+const weekStartOf = (dateStr: string) => {
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() - d.getDay());
+  return d.toISOString().slice(0, 10);
+};
+const weekRangeLabel = (weekStart: string) => {
+  const start = new Date(weekStart + "T00:00:00");
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  const f = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return `${f(start)} – ${f(end)}`;
+};
+
+interface WeekGroup {
+  weekStart: string;
+  entries: LedgerEntry[];
+  gross: number;
+  fuel: number;
+  cashReceived: number;
+  repairExpense: number;
+  hours: number;
+  net: number;
+}
+
+function groupByWeek(entries: LedgerEntry[]): WeekGroup[] {
+  const map = new Map<string, LedgerEntry[]>();
+  for (const e of entries) {
+    const ws = weekStartOf(e.entryDate);
+    if (!map.has(ws)) map.set(ws, []);
+    map.get(ws)!.push(e);
+  }
+  const groups: WeekGroup[] = Array.from(map.entries()).map(([weekStart, weekEntries]) => ({
+    weekStart,
+    entries: weekEntries,
+    gross: weekEntries.reduce((s, e) => s + (e.grossCents ?? 0), 0),
+    fuel: weekEntries.reduce((s, e) => s + (e.fuelCostCents ?? 0), 0),
+    cashReceived: weekEntries.reduce((s, e) => s + (e.cashReceivedCents ?? 0), 0),
+    repairExpense: weekEntries.reduce((s, e) => s + (e.cashExpenseCents ?? 0), 0),
+    hours: weekEntries.reduce((s, e) => s + (e.workingHours ?? 0), 0),
+    net: weekEntries.reduce((s, e) => s + (e.netCents ?? 0), 0),
+  }));
+  return groups.sort((a, b) => (a.weekStart < b.weekStart ? 1 : -1));
+}
+
 const fieldLabel = "block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5";
 const fieldInput =
   "w-full h-12 rounded-xl bg-white px-4 text-slate-800 border border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 focus:outline-none transition-colors";
@@ -30,6 +75,8 @@ const fieldInput =
 export default function DriverLedgerPage() {
   const [feePercent, setFeePercent] = useState(12);
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
+  const [paidWeeks, setPaidWeeks] = useState<Set<string>>(new Set());
+  const [togglingWeek, setTogglingWeek] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -46,16 +93,33 @@ export default function DriverLedgerPage() {
   });
 
   const load = async () => {
-    const [meRes, entriesRes] = await Promise.all([
+    const [meRes, entriesRes, weeksRes] = await Promise.all([
       fetch("/api/auth/me").then((r) => r.json()),
       fetch("/api/ledger/entries").then((r) => r.json()),
+      fetch("/api/ledger/weekly-payments").then((r) => r.json()),
     ]);
     setFeePercent(meRes.user?.ledgerFeePercent ?? 12);
     setEntries(entriesRes.entries || []);
+    setPaidWeeks(new Set(weeksRes.weeks || []));
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
+
+  const toggleWeekPaid = async (weekStart: string, isPaid: boolean) => {
+    setTogglingWeek(weekStart);
+    if (isPaid) {
+      await fetch(`/api/ledger/weekly-payments?weekStart=${weekStart}`, { method: "DELETE" });
+    } else {
+      await fetch("/api/ledger/weekly-payments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ weekStart }),
+      });
+    }
+    await load();
+    setTogglingWeek(null);
+  };
 
   const resetForm = () => {
     setForm({ entryDate: today(), odometer: "", gallons: "", fuelPrice: "", gross: "", cashReceived: "", hours: "", repairCost: "", repairNote: "" });
@@ -96,7 +160,17 @@ export default function DriverLedgerPage() {
       : null;
   const previewPerHour = previewNet != null && form.hours ? previewNet / parseFloat(form.hours) : null;
 
-  const payoutOwed = entries.reduce((sum, e) => sum + (e.netCents ?? 0), 0);
+  const weeks = groupByWeek(entries);
+  const payoutOwed = weeks
+    .filter((w) => !paidWeeks.has(w.weekStart))
+    .reduce((sum, w) => sum + w.net, 0);
+
+  const thisWeekStart = weekStartOf(today());
+  const lastWeekDate = new Date(thisWeekStart + "T00:00:00");
+  lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+  const lastWeekStart = lastWeekDate.toISOString().slice(0, 10);
+  const thisWeek = weeks.find((w) => w.weekStart === thisWeekStart);
+  const lastWeek = weeks.find((w) => w.weekStart === lastWeekStart);
 
   if (loading) {
     return (
@@ -126,6 +200,19 @@ export default function DriverLedgerPage() {
         <p className="text-amber-100 text-sm font-medium">Payout owed (all time)</p>
         <p className="text-4xl font-bold tracking-tight mt-1">{fmt(payoutOwed)}</p>
         <p className="text-amber-100 text-xs mt-2">After {feePercent}% dispatch fee, fuel & cash received</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+          <p className="text-xs text-slate-400">This week</p>
+          <p className="text-lg font-bold text-slate-800">{fmt(thisWeek?.net ?? 0)}</p>
+          <p className="text-xs text-slate-400">Gross {fmt(thisWeek?.gross ?? 0)}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+          <p className="text-xs text-slate-400">Last week</p>
+          <p className="text-lg font-bold text-slate-800">{fmt(lastWeek?.net ?? 0)}</p>
+          <p className="text-xs text-slate-400">Gross {fmt(lastWeek?.gross ?? 0)}</p>
+        </div>
       </div>
 
       {showForm && (
@@ -277,37 +364,64 @@ export default function DriverLedgerPage() {
       )}
 
       <div>
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Entries</h2>
-        {entries.length === 0 ? (
+        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">By week</h2>
+        {weeks.length === 0 ? (
           <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
             <p className="text-3xl mb-2">📒</p>
             <p className="text-slate-400 text-sm">No entries yet</p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {entries.map((e) => (
-              <div key={e.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-800">{e.entryDate}</span>
-                  {e.netCents != null && (
-                    <span className={`font-bold ${e.netCents < 0 ? "text-red-600" : "text-slate-800"}`}>
-                      {fmt(e.netCents)}
-                    </span>
-                  )}
+          <div className="space-y-4">
+            {weeks.map((w) => {
+              const isPaid = paidWeeks.has(w.weekStart);
+              return (
+                <div key={w.weekStart} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                  <div className="p-4 flex items-center justify-between bg-slate-50 border-b border-slate-100">
+                    <div>
+                      <p className="font-semibold text-slate-800">{weekRangeLabel(w.weekStart)}</p>
+                      <p className="text-xs text-slate-400">Gross {fmt(w.gross)} · {w.hours ? `${w.hours}h` : "—"}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`font-bold ${w.net < 0 ? "text-red-600" : "text-slate-800"}`}>{fmt(w.net)}</span>
+                      <button
+                        onClick={() => toggleWeekPaid(w.weekStart, isPaid)}
+                        disabled={togglingWeek === w.weekStart}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap disabled:opacity-50 ${
+                          isPaid ? "bg-green-100 text-green-700 border border-green-300" : "bg-amber-600 text-white active:bg-amber-700"
+                        }`}
+                      >
+                        {togglingWeek === w.weekStart ? "..." : isPaid ? "✅ Paid" : "Mark Paid"}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="divide-y divide-slate-100">
+                    {w.entries.map((e) => (
+                      <div key={e.id} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-slate-800">{e.entryDate}</span>
+                          {e.netCents != null && (
+                            <span className={`font-bold ${e.netCents < 0 ? "text-red-600" : "text-slate-800"}`}>
+                              {fmt(e.netCents)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-400 mt-1">
+                          {e.gallons != null && <span>⛽ {e.gallons}gal{e.mpg != null ? ` · ${e.mpg.toFixed(1)} mpg` : ""}</span>}
+                          {e.grossCents != null && <span>GROSS {fmt(e.grossCents)}</span>}
+                          {e.workingHours != null && (
+                            <span>{e.workingHours}h{e.moneyPerHour != null ? ` · $${(e.moneyPerHour / 100).toFixed(2)}/hr` : ""}</span>
+                          )}
+                          {e.cashReceivedCents != null && <span>💵 received {fmt(e.cashReceivedCents)}</span>}
+                          {e.cashExpenseCents != null && (
+                            <span className="text-amber-600">🔧 {fmt(e.cashExpenseCents)}{e.cashExpenseNote ? ` ${e.cashExpenseNote}` : ""}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-400 mt-1">
-                  {e.gallons != null && <span>⛽ {e.gallons}gal{e.mpg != null ? ` · ${e.mpg.toFixed(1)} mpg` : ""}</span>}
-                  {e.grossCents != null && <span>GROSS {fmt(e.grossCents)}</span>}
-                  {e.workingHours != null && (
-                    <span>{e.workingHours}h{e.moneyPerHour != null ? ` · $${(e.moneyPerHour / 100).toFixed(2)}/hr` : ""}</span>
-                  )}
-                  {e.cashReceivedCents != null && <span>💵 received {fmt(e.cashReceivedCents)}</span>}
-                  {e.cashExpenseCents != null && (
-                    <span className="text-amber-600">🔧 {fmt(e.cashExpenseCents)}{e.cashExpenseNote ? ` ${e.cashExpenseNote}` : ""}</span>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

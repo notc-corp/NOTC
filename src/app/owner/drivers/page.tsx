@@ -14,6 +14,7 @@ interface Driver {
   autoLogoutMidnight: boolean;
   ledgerEnabled: boolean;
   ledgerFeePercent: number;
+  preTripInspectionEnabled: boolean;
 }
 
 export default function DriversPage() {
@@ -30,6 +31,7 @@ export default function DriversPage() {
     autoLogoutMidnight: true,
     ledgerEnabled: false,
     ledgerFeePercent: "12",
+    preTripInspectionEnabled: true,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [unlocking, setUnlocking] = useState<number | null>(null);
@@ -48,7 +50,7 @@ export default function DriversPage() {
   }, []);
 
   const resetForm = () => {
-    setForm({ name: "", username: "", password: "", truckNumber: "", phone: "", autoLogoutMidnight: true, ledgerEnabled: false, ledgerFeePercent: "12" });
+    setForm({ name: "", username: "", password: "", truckNumber: "", phone: "", autoLogoutMidnight: true, ledgerEnabled: false, ledgerFeePercent: "12", preTripInspectionEnabled: true });
     setShowForm(false);
     setEditingId(null);
     setShowPassword(false);
@@ -66,6 +68,7 @@ export default function DriversPage() {
         autoLogoutMidnight: form.autoLogoutMidnight,
         ledgerEnabled: form.ledgerEnabled,
         ledgerFeePercent: parseFloat(form.ledgerFeePercent) || 12,
+        preTripInspectionEnabled: form.preTripInspectionEnabled,
       };
       if (form.password) body.password = form.password;
 
@@ -96,6 +99,7 @@ export default function DriversPage() {
       autoLogoutMidnight: driver.autoLogoutMidnight,
       ledgerEnabled: driver.ledgerEnabled,
       ledgerFeePercent: String(driver.ledgerFeePercent ?? 12),
+      preTripInspectionEnabled: driver.preTripInspectionEnabled,
     });
     setEditingId(driver.id);
     setShowForm(true);
@@ -226,6 +230,19 @@ export default function DriversPage() {
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.autoLogoutMidnight ? "translate-x-5" : ""}`} />
             </button>
           </label>
+          <label className="flex items-center justify-between px-1 cursor-pointer select-none">
+            <div>
+              <p className="text-sm font-medium text-slate-700">Pre-Trip Inspection</p>
+              <p className="text-xs text-slate-400">Require checklist before Start Trip</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm(f => ({ ...f, preTripInspectionEnabled: !f.preTripInspectionEnabled }))}
+              className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${form.preTripInspectionEnabled ? "bg-amber-600" : "bg-slate-300"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.preTripInspectionEnabled ? "translate-x-5" : ""}`} />
+            </button>
+          </label>
           {editingId && (
             <div className="space-y-2 pt-2 border-t border-slate-100">
               <label className="flex items-center justify-between px-1 cursor-pointer select-none">
@@ -287,24 +304,25 @@ export default function DriversPage() {
                     : "border-slate-200"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-medium text-lg text-slate-800">{driver.name}</p>
                       {locked && (
-                        <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-medium">
+                        <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full font-medium shrink-0">
                           🔒 {lockTimeRemaining(driver.lockedUntil!)}
                         </span>
                       )}
                     </div>
-                    <div className="flex gap-3 text-sm text-slate-500 mt-0.5">
-                      {driver.username && <span>@{driver.username}</span>}
-                      {driver.truckNumber && <span>🚛 {driver.truckNumber}</span>}
-                      {driver.ledgerEnabled && <span>📒 Ledger ({driver.ledgerFeePercent}%)</span>}
-                      {driver.phone && <span>📱 {driver.phone}</span>}
-                      {!driver.isActive && <span className="text-red-500">Inactive</span>}
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500 mt-0.5">
+                      {driver.username && <span className="whitespace-nowrap">@{driver.username}</span>}
+                      {driver.truckNumber && <span className="whitespace-nowrap">🚛 {driver.truckNumber}</span>}
+                      {driver.ledgerEnabled && <span className="whitespace-nowrap">📒 Ledger ({driver.ledgerFeePercent}%)</span>}
+                      {!driver.preTripInspectionEnabled && <span className="whitespace-nowrap text-amber-600">⛔ No pre-trip check</span>}
+                      {driver.phone && <span className="whitespace-nowrap">📱 {driver.phone}</span>}
+                      {!driver.isActive && <span className="whitespace-nowrap text-red-500">Inactive</span>}
                       {!locked && driver.failedAttempts > 0 && (
-                        <span className="text-amber-600">⚠️ {driver.failedAttempts} bad attempt{driver.failedAttempts > 1 ? "s" : ""}</span>
+                        <span className="whitespace-nowrap text-amber-600">⚠️ {driver.failedAttempts} bad attempt{driver.failedAttempts > 1 ? "s" : ""}</span>
                       )}
                     </div>
                   </div>

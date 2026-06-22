@@ -28,6 +28,7 @@ export async function GET() {
       autoLogoutMidnight: users.autoLogoutMidnight,
       ledgerEnabled: users.ledgerEnabled,
       ledgerFeePercent: users.ledgerFeePercent,
+      preTripInspectionEnabled: users.preTripInspectionEnabled,
     })
     .from(users)
     .where(and(...conditions));

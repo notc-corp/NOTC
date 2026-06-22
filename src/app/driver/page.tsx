@@ -26,6 +26,7 @@ export default function DriverDashboard() {
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [todayExpenses, setTodayExpenses] = useState<Expense[]>([]);
   const [ledgerEnabled, setLedgerEnabled] = useState(false);
+  const [preTripInspectionEnabled, setPreTripInspectionEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
   const [gpsStatus, setGpsStatus] = useState<"off" | "active" | "error">("off");
@@ -42,6 +43,7 @@ export default function DriverDashboard() {
       setActiveTrip(tripsData.trips?.[0] || null);
       setTodayExpenses(expensesData.expenses || []);
       setLedgerEnabled(!!meData.user?.ledgerEnabled);
+      setPreTripInspectionEnabled(meData.user?.preTripInspectionEnabled ?? true);
       setLoading(false);
     });
   };
@@ -183,7 +185,7 @@ export default function DriverDashboard() {
           </>
         ) : (
           <Link
-            href="/driver/inspection/pre"
+            href={preTripInspectionEnabled ? "/driver/inspection/pre" : "/driver/photo?action=start"}
             className="block w-full h-20 rounded-xl bg-green-600 text-white text-2xl font-bold active:bg-green-700 transition-colors text-center leading-[5rem]"
           >
             Start Trip

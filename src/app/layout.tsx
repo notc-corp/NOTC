@@ -59,12 +59,37 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         {children}
-        {process.env.NODE_ENV === "production" && (
+        {process.env.NODE_ENV === "production" ? (
           <Script id="sw-register" strategy="afterInteractive">
             {`
               if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js').catch(console.error);
               }
+            `}
+          </Script>
+        ) : (
+          <Script id="sw-unregister" strategy="beforeInteractive">
+            {`
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then((regs) => {
+                  for (const reg of regs) reg.unregister();
+                });
+                if (window.caches) {
+                  caches.keys().then((keys) => keys.forEach((k) => caches.delete(k)));
+                }
+              }
+              (function () {
+                var hiddenAt = null;
+                var STALE_AFTER_MS = 60000;
+                document.addEventListener('visibilitychange', function () {
+                  if (document.visibilityState === 'hidden') {
+                    hiddenAt = Date.now();
+                  } else if (document.visibilityState === 'visible' && hiddenAt) {
+                    if (Date.now() - hiddenAt > STALE_AFTER_MS) location.reload();
+                    hiddenAt = null;
+                  }
+                });
+              })();
             `}
           </Script>
         )}

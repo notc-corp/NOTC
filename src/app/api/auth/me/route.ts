@@ -15,6 +15,7 @@ export async function GET() {
       autoLogoutMidnight: users.autoLogoutMidnight,
       ledgerEnabled: users.ledgerEnabled,
       ledgerFeePercent: users.ledgerFeePercent,
+      preTripInspectionEnabled: users.preTripInspectionEnabled,
     })
     .from(users)
     .where(eq(users.id, session.userId));
@@ -27,6 +28,7 @@ export async function GET() {
       autoLogoutMidnight: user?.autoLogoutMidnight ?? true,
       ledgerEnabled: user?.ledgerEnabled ?? false,
       ledgerFeePercent: user?.ledgerFeePercent ?? 12,
+      preTripInspectionEnabled: user?.preTripInspectionEnabled ?? true,
     },
   });
 }

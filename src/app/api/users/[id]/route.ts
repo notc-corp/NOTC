@@ -40,6 +40,7 @@ export async function PATCH(
   if (body.autoLogoutMidnight !== undefined) updates.autoLogoutMidnight = body.autoLogoutMidnight;
   if (body.ledgerEnabled !== undefined) updates.ledgerEnabled = body.ledgerEnabled;
   if (body.ledgerFeePercent !== undefined) updates.ledgerFeePercent = body.ledgerFeePercent;
+  if (body.preTripInspectionEnabled !== undefined) updates.preTripInspectionEnabled = body.preTripInspectionEnabled;
 
   const [result] = await db
     .update(users)
