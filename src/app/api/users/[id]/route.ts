@@ -38,6 +38,8 @@ export async function PATCH(
     updates.failedAttempts = 0;
   }
   if (body.autoLogoutMidnight !== undefined) updates.autoLogoutMidnight = body.autoLogoutMidnight;
+  if (body.ledgerEnabled !== undefined) updates.ledgerEnabled = body.ledgerEnabled;
+  if (body.ledgerFeePercent !== undefined) updates.ledgerFeePercent = body.ledgerFeePercent;
 
   const [result] = await db
     .update(users)

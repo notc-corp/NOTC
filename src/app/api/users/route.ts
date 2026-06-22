@@ -26,6 +26,8 @@ export async function GET() {
       lockedUntil: users.lockedUntil,
       failedAttempts: users.failedAttempts,
       autoLogoutMidnight: users.autoLogoutMidnight,
+      ledgerEnabled: users.ledgerEnabled,
+      ledgerFeePercent: users.ledgerFeePercent,
     })
     .from(users)
     .where(and(...conditions));

@@ -11,7 +11,11 @@ export async function GET() {
   }
 
   const [user] = await db
-    .select({ autoLogoutMidnight: users.autoLogoutMidnight })
+    .select({
+      autoLogoutMidnight: users.autoLogoutMidnight,
+      ledgerEnabled: users.ledgerEnabled,
+      ledgerFeePercent: users.ledgerFeePercent,
+    })
     .from(users)
     .where(eq(users.id, session.userId));
 
@@ -21,6 +25,8 @@ export async function GET() {
       role: session.role,
       name: session.name,
       autoLogoutMidnight: user?.autoLogoutMidnight ?? true,
+      ledgerEnabled: user?.ledgerEnabled ?? false,
+      ledgerFeePercent: user?.ledgerFeePercent ?? 12,
     },
   });
 }

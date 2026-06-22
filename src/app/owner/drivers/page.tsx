@@ -12,6 +12,8 @@ interface Driver {
   lockedUntil: string | null;
   failedAttempts: number;
   autoLogoutMidnight: boolean;
+  ledgerEnabled: boolean;
+  ledgerFeePercent: number;
 }
 
 export default function DriversPage() {
@@ -26,6 +28,8 @@ export default function DriversPage() {
     truckNumber: "",
     phone: "",
     autoLogoutMidnight: true,
+    ledgerEnabled: false,
+    ledgerFeePercent: "12",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [unlocking, setUnlocking] = useState<number | null>(null);
@@ -44,7 +48,7 @@ export default function DriversPage() {
   }, []);
 
   const resetForm = () => {
-    setForm({ name: "", username: "", password: "", truckNumber: "", phone: "", autoLogoutMidnight: true });
+    setForm({ name: "", username: "", password: "", truckNumber: "", phone: "", autoLogoutMidnight: true, ledgerEnabled: false, ledgerFeePercent: "12" });
     setShowForm(false);
     setEditingId(null);
     setShowPassword(false);
@@ -54,12 +58,14 @@ export default function DriversPage() {
     if (!form.name || !form.username || (!editingId && !form.password)) return;
 
     if (editingId) {
-      const body: Record<string, string | boolean> = {
+      const body: Record<string, string | boolean | number> = {
         name: form.name,
         username: form.username,
         truckNumber: form.truckNumber,
         phone: form.phone,
         autoLogoutMidnight: form.autoLogoutMidnight,
+        ledgerEnabled: form.ledgerEnabled,
+        ledgerFeePercent: parseFloat(form.ledgerFeePercent) || 12,
       };
       if (form.password) body.password = form.password;
 
@@ -88,6 +94,8 @@ export default function DriversPage() {
       truckNumber: driver.truckNumber || "",
       phone: driver.phone || "",
       autoLogoutMidnight: driver.autoLogoutMidnight,
+      ledgerEnabled: driver.ledgerEnabled,
+      ledgerFeePercent: String(driver.ledgerFeePercent ?? 12),
     });
     setEditingId(driver.id);
     setShowForm(true);
@@ -218,6 +226,37 @@ export default function DriversPage() {
               <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.autoLogoutMidnight ? "translate-x-5" : ""}`} />
             </button>
           </label>
+          {editingId && (
+            <div className="space-y-2 pt-2 border-t border-slate-100">
+              <label className="flex items-center justify-between px-1 cursor-pointer select-none">
+                <div>
+                  <p className="text-sm font-medium text-slate-700">Gross Ledger</p>
+                  <p className="text-xs text-slate-400">Fuel + load + dispatch fee tracking (car hauling)</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, ledgerEnabled: !f.ledgerEnabled }))}
+                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${form.ledgerEnabled ? "bg-amber-600" : "bg-slate-300"}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.ledgerEnabled ? "translate-x-5" : ""}`} />
+                </button>
+              </label>
+              {form.ledgerEnabled && (
+                <div className="flex items-center gap-2 px-1">
+                  <label className="text-sm text-slate-600 shrink-0">Dispatch fee %</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    value={form.ledgerFeePercent}
+                    onChange={(e) => setForm({ ...form, ledgerFeePercent: e.target.value })}
+                    className="w-20 h-9 rounded-lg bg-white px-3 text-slate-800 border border-slate-300 focus:border-amber-600 focus:outline-none"
+                  />
+                </div>
+              )}
+            </div>
+          )}
           <button
             onClick={handleSubmit}
             disabled={!form.name || !form.username || (!editingId && !form.password)}
@@ -261,6 +300,7 @@ export default function DriversPage() {
                     <div className="flex gap-3 text-sm text-slate-500 mt-0.5">
                       {driver.username && <span>@{driver.username}</span>}
                       {driver.truckNumber && <span>🚛 {driver.truckNumber}</span>}
+                      {driver.ledgerEnabled && <span>📒 Ledger ({driver.ledgerFeePercent}%)</span>}
                       {driver.phone && <span>📱 {driver.phone}</span>}
                       {!driver.isActive && <span className="text-red-500">Inactive</span>}
                       {!locked && driver.failedAttempts > 0 && (

@@ -25,6 +25,7 @@ const GPS_INTERVAL_MS = 30_000;
 export default function DriverDashboard() {
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [todayExpenses, setTodayExpenses] = useState<Expense[]>([]);
+  const [ledgerEnabled, setLedgerEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
   const [gpsStatus, setGpsStatus] = useState<"off" | "active" | "error">("off");
@@ -36,9 +37,11 @@ export default function DriverDashboard() {
     Promise.all([
       fetch("/api/trips?status=active").then((r) => r.json()),
       fetch("/api/expenses?today=true").then((r) => r.json()),
-    ]).then(([tripsData, expensesData]) => {
+      fetch("/api/auth/me").then((r) => r.json()),
+    ]).then(([tripsData, expensesData, meData]) => {
       setActiveTrip(tripsData.trips?.[0] || null);
       setTodayExpenses(expensesData.expenses || []);
+      setLedgerEnabled(!!meData.user?.ledgerEnabled);
       setLoading(false);
     });
   };
@@ -205,6 +208,15 @@ export default function DriverDashboard() {
       >
         💵 My Earnings
       </Link>
+
+      {ledgerEnabled && (
+        <Link
+          href="/driver/ledger"
+          className="block w-full h-14 rounded-xl bg-slate-700 text-white text-lg font-semibold active:bg-slate-800 transition-colors text-center leading-[3.5rem]"
+        >
+          📒 Gross Ledger
+        </Link>
+      )}
 
       {/* Today's Expenses */}
       <div>

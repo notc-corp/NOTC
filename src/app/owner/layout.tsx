@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: "/owner/defects", label: "Issues", icon: "🔧" },
   { href: "/owner/trucks", label: "Trucks", icon: "🚚" },
   { href: "/owner/salary", label: "Salary", icon: "💵" },
+  { href: "/owner/ledger", label: "Ledger", icon: "📒" },
   { href: "/owner/trucks/accounting", label: "Accounting", icon: "📑" },
   { href: "/owner/settings", label: "Settings", icon: "⚙️" },
 ];

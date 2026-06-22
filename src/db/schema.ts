@@ -39,6 +39,8 @@ export const users = pgTable("users", {
   lockedUntil: text("locked_until"),
   lockLevel: integer("lock_level").notNull().default(0),
   autoLogoutMidnight: boolean("auto_logout_midnight").notNull().default(true),
+  ledgerEnabled: boolean("ledger_enabled").notNull().default(false),
+  ledgerFeePercent: real("ledger_fee_percent").notNull().default(12),
 });
 
 export const trips = pgTable("trips", {
@@ -186,6 +188,23 @@ export const salaryPayments = pgTable("salary_payments", {
   notes: text("notes"),
   paidAt: text("paid_at").notNull().$default(() => new Date().toISOString()),
   createdBy: integer("created_by").references(() => users.id),
+});
+
+export const ledgerEntries = pgTable("ledger_entries", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").references(() => companies.id),
+  driverId: integer("driver_id").notNull().references(() => users.id),
+  entryDate: text("entry_date").notNull(),
+  odometer: real("odometer"),
+  gallons: real("gallons"),
+  fuelPricePerGallon: real("fuel_price_per_gallon"),
+  fuelCostCents: integer("fuel_cost_cents"),
+  grossCents: integer("gross_cents"),
+  workingHours: real("working_hours"),
+  cashReceivedCents: integer("cash_received_cents"),
+  cashExpenseCents: integer("cash_expense_cents"),
+  cashExpenseNote: text("cash_expense_note"),
+  createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
 });
 
 export const salaryEntries = pgTable("salary_entries", {
