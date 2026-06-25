@@ -332,7 +332,6 @@ export default function DriverLedgerPage() {
               <label className={fieldLabel}>Gross (load)</label>
               <input
                 type="text"
-                inputMode="decimal"
                 placeholder="e.g. 150+200+300"
                 value={form.gross}
                 onChange={(e) => setForm({ ...form, gross: e.target.value })}

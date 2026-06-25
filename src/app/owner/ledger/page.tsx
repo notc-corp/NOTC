@@ -256,11 +256,11 @@ export default function OwnerLedgerPage() {
                     </div>
 
                     <div className="bg-white rounded-lg border border-slate-200 p-3 space-y-2">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <p className="text-sm font-semibold text-slate-700">Recurring deductions</p>
                         <button
                           onClick={() => setAddingDeductionFor(addingDeductionFor === driver.id ? null : driver.id)}
-                          className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 active:bg-slate-200"
+                          className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 active:bg-slate-200 shrink-0"
                         >
                           + Add deduction
                         </button>
@@ -271,14 +271,14 @@ export default function OwnerLedgerPage() {
                       )}
 
                       {activeDeductions.map((d) => (
-                        <div key={d.id} className="flex items-center justify-between text-sm">
-                          <span className="text-slate-700">{d.label} · since {d.startWeek}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-red-600">-{fmt(d.amountCents)}/wk</span>
+                        <div key={d.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                          <span className="text-slate-700 min-w-0">{d.label} · since {d.startWeek}</span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="font-semibold text-red-600 whitespace-nowrap">-{fmt(d.amountCents)}/wk</span>
                             <button
                               onClick={() => stopDeduction(d.id)}
                               disabled={stoppingId === d.id}
-                              className="text-xs px-2 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 active:bg-red-100 disabled:opacity-50"
+                              className="text-xs px-2 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 active:bg-red-100 disabled:opacity-50 shrink-0"
                             >
                               {stoppingId === d.id ? "..." : "Stop"}
                             </button>
@@ -297,25 +297,27 @@ export default function OwnerLedgerPage() {
                       )}
 
                       {addingDeductionFor === driver.id && (
-                        <div className="pt-2 border-t border-slate-100 flex gap-2">
-                          <input
-                            type="text"
-                            placeholder="Label (e.g. Escrow)"
-                            value={deductionForm.label}
-                            onChange={(e) => setDeductionForm({ ...deductionForm, label: e.target.value })}
-                            className="flex-1 h-9 rounded-lg border border-slate-300 px-2 text-sm"
-                          />
-                          <input
-                            type="number"
-                            step="0.01"
-                            placeholder="$/wk"
-                            value={deductionForm.amount}
-                            onChange={(e) => setDeductionForm({ ...deductionForm, amount: e.target.value })}
-                            className="w-24 h-9 rounded-lg border border-slate-300 px-2 text-sm"
-                          />
+                        <div className="pt-2 border-t border-slate-100 space-y-2">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="Label (e.g. Escrow)"
+                              value={deductionForm.label}
+                              onChange={(e) => setDeductionForm({ ...deductionForm, label: e.target.value })}
+                              className="flex-1 min-w-0 h-9 rounded-lg border border-slate-300 px-2 text-sm"
+                            />
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="$/wk"
+                              value={deductionForm.amount}
+                              onChange={(e) => setDeductionForm({ ...deductionForm, amount: e.target.value })}
+                              className="w-20 h-9 rounded-lg border border-slate-300 px-2 text-sm"
+                            />
+                          </div>
                           <button
                             onClick={() => addDeduction(driver.id)}
-                            className="px-3 h-9 rounded-lg bg-amber-600 text-white text-sm font-medium active:bg-amber-700"
+                            className="w-full h-9 rounded-lg bg-amber-600 text-white text-sm font-medium active:bg-amber-700"
                           >
                             Add
                           </button>
