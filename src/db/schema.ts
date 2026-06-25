@@ -206,6 +206,18 @@ export const ledgerEntries = pgTable("ledger_entries", {
   cashExpenseCents: integer("cash_expense_cents"),
   cashExpenseNote: text("cash_expense_note"),
   createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
+  editedAt: text("edited_at"),
+});
+
+export const ledgerDeductions = pgTable("ledger_deductions", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").references(() => companies.id),
+  driverId: integer("driver_id").notNull().references(() => users.id),
+  label: text("label").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  startWeek: text("start_week").notNull(),
+  stoppedWeek: text("stopped_week"),
+  createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
 });
 
 export const ledgerWeeklyPayments = pgTable("ledger_weekly_payments", {

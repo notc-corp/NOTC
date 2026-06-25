@@ -18,10 +18,35 @@ interface LedgerEntry {
   mpg: number | null;
   netCents: number | null;
   moneyPerHour: number | null;
+  editedAt: string | null;
+}
+
+interface Deduction {
+  id: number;
+  label: string;
+  amountCents: number;
+  startWeek: string;
+  stoppedWeek: string | null;
 }
 
 const fmt = (cents: number | null) => (cents == null ? "—" : `$${(cents / 100).toFixed(2)}`);
 const today = () => new Date().toISOString().slice(0, 10);
+
+// Accepts plain numbers or "+"-separated sums like "150+200+300", with an optional trailing "=".
+function parseGrossFormula(input: string): number | null {
+  const cleaned = input.trim().replace(/=\s*$/, "");
+  if (!cleaned) return null;
+  const parts = cleaned.split("+").map((p) => p.trim());
+  if (parts.some((p) => p === "" || isNaN(Number(p)))) return null;
+  return parts.reduce((sum, p) => sum + Number(p), 0);
+}
+
+function deductionsForWeek(deductions: Deduction[], weekStart: string) {
+  const items = deductions.filter(
+    (d) => d.startWeek <= weekStart && (d.stoppedWeek == null || weekStart < d.stoppedWeek)
+  );
+  return { items, total: items.reduce((s, d) => s + d.amountCents, 0) };
+}
 
 // Weeks run Sunday–Saturday.
 const weekStartOf = (dateStr: string) => {
@@ -75,10 +100,12 @@ const fieldInput =
 export default function DriverLedgerPage() {
   const [feePercent, setFeePercent] = useState(12);
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
+  const [deductions, setDeductions] = useState<Deduction[]>([]);
   const [paidWeeks, setPaidWeeks] = useState<Set<string>>(new Set());
   const [togglingWeek, setTogglingWeek] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     entryDate: today(),
@@ -93,14 +120,16 @@ export default function DriverLedgerPage() {
   });
 
   const load = async () => {
-    const [meRes, entriesRes, weeksRes] = await Promise.all([
+    const [meRes, entriesRes, weeksRes, deductionsRes] = await Promise.all([
       fetch("/api/auth/me").then((r) => r.json()),
       fetch("/api/ledger/entries").then((r) => r.json()),
       fetch("/api/ledger/weekly-payments").then((r) => r.json()),
+      fetch("/api/ledger/deductions").then((r) => r.json()),
     ]);
     setFeePercent(meRes.user?.ledgerFeePercent ?? 12);
     setEntries(entriesRes.entries || []);
     setPaidWeeks(new Set(weeksRes.weeks || []));
+    setDeductions(deductionsRes.deductions || []);
     setLoading(false);
   };
 
@@ -124,7 +153,26 @@ export default function DriverLedgerPage() {
   const resetForm = () => {
     setForm({ entryDate: today(), odometer: "", gallons: "", fuelPrice: "", gross: "", cashReceived: "", hours: "", repairCost: "", repairNote: "" });
     setShowForm(false);
+    setEditingId(null);
   };
+
+  const startEdit = (e: LedgerEntry) => {
+    setForm({
+      entryDate: e.entryDate,
+      odometer: e.odometer != null ? String(e.odometer) : "",
+      gallons: e.gallons != null ? String(e.gallons) : "",
+      fuelPrice: e.fuelPricePerGallon != null ? String(e.fuelPricePerGallon) : "",
+      gross: e.grossCents != null ? String(e.grossCents / 100) : "",
+      cashReceived: e.cashReceivedCents != null ? String(e.cashReceivedCents / 100) : "",
+      hours: e.workingHours != null ? String(e.workingHours) : "",
+      repairCost: e.cashExpenseCents != null ? String(e.cashExpenseCents / 100) : "",
+      repairNote: e.cashExpenseNote ?? "",
+    });
+    setEditingId(e.id);
+    setShowForm(true);
+  };
+
+  const parsedGross = parseGrossFormula(form.gross);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -132,14 +180,14 @@ export default function DriverLedgerPage() {
     if (form.odometer) body.odometer = parseFloat(form.odometer);
     if (form.gallons) body.gallons = parseFloat(form.gallons);
     if (form.fuelPrice) body.fuelPricePerGallon = parseFloat(form.fuelPrice);
-    if (form.gross) body.grossCents = Math.round(parseFloat(form.gross) * 100);
+    if (parsedGross != null) body.grossCents = Math.round(parsedGross * 100);
     if (form.cashReceived) body.cashReceivedCents = Math.round(parseFloat(form.cashReceived) * 100);
     if (form.hours) body.workingHours = parseFloat(form.hours);
     if (form.repairCost) body.cashExpenseCents = Math.round(parseFloat(form.repairCost) * 100);
     if (form.repairNote) body.cashExpenseNote = form.repairNote;
 
-    const res = await fetch("/api/ledger/entries", {
-      method: "POST",
+    const res = await fetch(editingId ? `/api/ledger/entries/${editingId}` : "/api/ledger/entries", {
+      method: editingId ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
@@ -154,16 +202,17 @@ export default function DriverLedgerPage() {
     form.fuelPrice && form.gallons ? Math.round(parseFloat(form.fuelPrice) * parseFloat(form.gallons) * 100) : null;
   const previewNet =
     form.gross !== "" || previewFuelCost != null || form.cashReceived !== ""
-      ? Math.round((form.gross ? parseFloat(form.gross) * 100 : 0) * (1 - feePercent / 100)) -
+      ? Math.round((parsedGross != null ? parsedGross * 100 : 0) * (1 - feePercent / 100)) -
         (previewFuelCost ?? 0) -
         (form.cashReceived ? Math.round(parseFloat(form.cashReceived) * 100) : 0)
       : null;
   const previewPerHour = previewNet != null && form.hours ? previewNet / parseFloat(form.hours) : null;
 
   const weeks = groupByWeek(entries);
+  const netAfterDeductions = (w: WeekGroup) => w.net - deductionsForWeek(deductions, w.weekStart).total;
   const payoutOwed = weeks
     .filter((w) => !paidWeeks.has(w.weekStart))
-    .reduce((sum, w) => sum + w.net, 0);
+    .reduce((sum, w) => sum + netAfterDeductions(w), 0);
 
   const thisWeekStart = weekStartOf(today());
   const lastWeekDate = new Date(thisWeekStart + "T00:00:00");
@@ -171,6 +220,8 @@ export default function DriverLedgerPage() {
   const lastWeekStart = lastWeekDate.toISOString().slice(0, 10);
   const thisWeek = weeks.find((w) => w.weekStart === thisWeekStart);
   const lastWeek = weeks.find((w) => w.weekStart === lastWeekStart);
+  const thisWeekDeductions = deductionsForWeek(deductions, thisWeekStart).total;
+  const lastWeekDeductions = deductionsForWeek(deductions, lastWeekStart).total;
 
   if (loading) {
     return (
@@ -199,25 +250,25 @@ export default function DriverLedgerPage() {
         <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10" />
         <p className="text-amber-100 text-sm font-medium">Payout owed (all time)</p>
         <p className="text-4xl font-bold tracking-tight mt-1">{fmt(payoutOwed)}</p>
-        <p className="text-amber-100 text-xs mt-2">After {feePercent}% dispatch fee, fuel & cash received</p>
+        <p className="text-amber-100 text-xs mt-2">After {feePercent}% dispatch fee, fuel, cash received & deductions</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
           <p className="text-xs text-slate-400">This week</p>
-          <p className="text-lg font-bold text-slate-800">{fmt(thisWeek?.net ?? 0)}</p>
-          <p className="text-xs text-slate-400">Gross {fmt(thisWeek?.gross ?? 0)}</p>
+          <p className="text-lg font-bold text-slate-800">{fmt((thisWeek?.net ?? 0) - thisWeekDeductions)}</p>
+          <p className="text-xs text-slate-400">Gross {fmt(thisWeek?.gross ?? 0)}{thisWeekDeductions ? ` · -${fmt(thisWeekDeductions)} deductions` : ""}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
           <p className="text-xs text-slate-400">Last week</p>
-          <p className="text-lg font-bold text-slate-800">{fmt(lastWeek?.net ?? 0)}</p>
-          <p className="text-xs text-slate-400">Gross {fmt(lastWeek?.gross ?? 0)}</p>
+          <p className="text-lg font-bold text-slate-800">{fmt((lastWeek?.net ?? 0) - lastWeekDeductions)}</p>
+          <p className="text-xs text-slate-400">Gross {fmt(lastWeek?.gross ?? 0)}{lastWeekDeductions ? ` · -${fmt(lastWeekDeductions)} deductions` : ""}</p>
         </div>
       </div>
 
       {showForm && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-          <h2 className="font-semibold text-slate-900">New entry</h2>
+          <h2 className="font-semibold text-slate-900">{editingId ? "Edit entry" : "New entry"}</h2>
 
           <div>
             <label className={fieldLabel}>Date</label>
@@ -280,14 +331,18 @@ export default function DriverLedgerPage() {
             <div>
               <label className={fieldLabel}>Gross (load)</label>
               <input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Optional"
+                type="text"
+                inputMode="decimal"
+                placeholder="e.g. 150+200+300"
                 value={form.gross}
                 onChange={(e) => setForm({ ...form, gross: e.target.value })}
                 className={fieldInput}
               />
+              {form.gross.includes("+") && (
+                <p className="text-xs mt-1 text-slate-500">
+                  {parsedGross != null ? `= $${parsedGross.toFixed(2)}` : "Can't parse this formula"}
+                </p>
+              )}
             </div>
             <div>
               <label className={fieldLabel}>Hours worked</label>
@@ -358,7 +413,7 @@ export default function DriverLedgerPage() {
             disabled={submitting}
             className="w-full h-12 rounded-xl bg-green-600 text-white font-bold shadow-sm disabled:opacity-40 active:scale-[0.98] active:bg-green-700 transition-all"
           >
-            {submitting ? "Saving..." : "Save"}
+            {submitting ? "Saving..." : editingId ? "Save changes" : "Save"}
           </button>
         </div>
       )}
@@ -374,15 +429,22 @@ export default function DriverLedgerPage() {
           <div className="space-y-4">
             {weeks.map((w) => {
               const isPaid = paidWeeks.has(w.weekStart);
+              const weekDeductions = deductionsForWeek(deductions, w.weekStart);
+              const netAfterWeekDeductions = w.net - weekDeductions.total;
               return (
                 <div key={w.weekStart} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                   <div className="p-4 flex items-center justify-between bg-slate-50 border-b border-slate-100">
                     <div>
                       <p className="font-semibold text-slate-800">{weekRangeLabel(w.weekStart)}</p>
                       <p className="text-xs text-slate-400">Gross {fmt(w.gross)} · {w.hours ? `${w.hours}h` : "—"}</p>
+                      {weekDeductions.items.length > 0 && (
+                        <p className="text-xs text-red-500 mt-0.5">
+                          -{fmt(weekDeductions.total)} ({weekDeductions.items.map((d) => d.label).join(", ")})
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`font-bold ${w.net < 0 ? "text-red-600" : "text-slate-800"}`}>{fmt(w.net)}</span>
+                      <span className={`font-bold ${netAfterWeekDeductions < 0 ? "text-red-600" : "text-slate-800"}`}>{fmt(netAfterWeekDeductions)}</span>
                       <button
                         onClick={() => toggleWeekPaid(w.weekStart, isPaid)}
                         disabled={togglingWeek === w.weekStart}
@@ -396,9 +458,16 @@ export default function DriverLedgerPage() {
                   </div>
                   <div className="divide-y divide-slate-100">
                     {w.entries.map((e) => (
-                      <div key={e.id} className="p-4">
+                      <div
+                        key={e.id}
+                        onClick={() => startEdit(e)}
+                        className="p-4 cursor-pointer active:bg-slate-50"
+                      >
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-slate-800">{e.entryDate}</span>
+                          <span className="font-medium text-slate-800">
+                            {e.entryDate}
+                            {e.editedAt && <span className="text-xs text-slate-400 font-normal ml-2">✏️ edited</span>}
+                          </span>
                           {e.netCents != null && (
                             <span className={`font-bold ${e.netCents < 0 ? "text-red-600" : "text-slate-800"}`}>
                               {fmt(e.netCents)}

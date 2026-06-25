@@ -141,6 +141,7 @@ export default function DriverDashboard() {
     )}
     <div className="space-y-6">
       {/* Trip Status */}
+      {(activeTrip || preTripInspectionEnabled) && (
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         {activeTrip ? (
           <>
@@ -192,6 +193,7 @@ export default function DriverDashboard() {
           </Link>
         )}
       </div>
+      )}
 
       {/* Add Receipt Button */}
       {activeTrip && (
@@ -204,12 +206,14 @@ export default function DriverDashboard() {
       )}
 
       {/* Salary shortcut */}
-      <Link
-        href="/driver/salary"
-        className="block w-full h-14 rounded-xl bg-slate-700 text-white text-lg font-semibold active:bg-slate-800 transition-colors text-center leading-[3.5rem]"
-      >
-        💵 My Earnings
-      </Link>
+      {preTripInspectionEnabled && (
+        <Link
+          href="/driver/salary"
+          className="block w-full h-14 rounded-xl bg-slate-700 text-white text-lg font-semibold active:bg-slate-800 transition-colors text-center leading-[3.5rem]"
+        >
+          💵 My Earnings
+        </Link>
+      )}
 
       {ledgerEnabled && (
         <Link

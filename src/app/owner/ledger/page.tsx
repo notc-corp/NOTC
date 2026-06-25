@@ -25,6 +25,15 @@ interface LedgerEntry {
   mpg: number | null;
   netCents: number | null;
   moneyPerHour: number | null;
+  editedAt: string | null;
+}
+
+interface Deduction {
+  id: number;
+  label: string;
+  amountCents: number;
+  startWeek: string;
+  stoppedWeek: string | null;
 }
 
 const fmt = (cents: number | null) => (cents == null ? "—" : `$${(cents / 100).toFixed(2)}`);
@@ -69,13 +78,26 @@ function groupByWeek(entries: LedgerEntry[]): WeekGroup[] {
   return groups.sort((a, b) => (a.weekStart < b.weekStart ? 1 : -1));
 }
 
+function deductionsForWeek(deductions: Deduction[], weekStart: string) {
+  const items = deductions.filter(
+    (d) => d.startWeek <= weekStart && (d.stoppedWeek == null || weekStart < d.stoppedWeek)
+  );
+  return { items, total: items.reduce((s, d) => s + d.amountCents, 0) };
+}
+
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
 export default function OwnerLedgerPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [entries, setEntries] = useState<Record<number, LedgerEntry[]>>({});
   const [paidWeeks, setPaidWeeks] = useState<Record<number, Set<string>>>({});
+  const [deductions, setDeductions] = useState<Record<number, Deduction[]>>({});
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<number | null>(null);
   const [togglingWeek, setTogglingWeek] = useState<string | null>(null);
+  const [stoppingId, setStoppingId] = useState<number | null>(null);
+  const [addingDeductionFor, setAddingDeductionFor] = useState<number | null>(null);
+  const [deductionForm, setDeductionForm] = useState({ label: "", amount: "" });
 
   const loadAll = async () => {
     const driversRes = await fetch("/api/users").then((r) => r.json());
@@ -84,18 +106,22 @@ export default function OwnerLedgerPage() {
 
     const entriesMap: Record<number, LedgerEntry[]> = {};
     const paidMap: Record<number, Set<string>> = {};
+    const deductionsMap: Record<number, Deduction[]> = {};
     await Promise.all(
       ledgerDrivers.map(async (d) => {
-        const [entriesRes, weeksRes] = await Promise.all([
+        const [entriesRes, weeksRes, deductionsRes] = await Promise.all([
           fetch(`/api/ledger/entries?driverId=${d.id}`).then((r) => r.json()),
           fetch(`/api/ledger/weekly-payments?driverId=${d.id}`).then((r) => r.json()),
+          fetch(`/api/ledger/deductions?driverId=${d.id}`).then((r) => r.json()),
         ]);
         entriesMap[d.id] = entriesRes.entries || [];
         paidMap[d.id] = new Set(weeksRes.weeks || []);
+        deductionsMap[d.id] = deductionsRes.deductions || [];
       })
     );
     setEntries(entriesMap);
     setPaidWeeks(paidMap);
+    setDeductions(deductionsMap);
     setLoading(false);
   };
 
@@ -116,6 +142,34 @@ export default function OwnerLedgerPage() {
     setTogglingWeek(null);
   };
 
+  const addDeduction = async (driverId: number) => {
+    if (!deductionForm.label || !deductionForm.amount) return;
+    await fetch("/api/ledger/deductions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        driverId,
+        label: deductionForm.label,
+        amountCents: Math.round(parseFloat(deductionForm.amount) * 100),
+        startWeek: weekStartOf(todayStr()),
+      }),
+    });
+    setDeductionForm({ label: "", amount: "" });
+    setAddingDeductionFor(null);
+    await loadAll();
+  };
+
+  const stopDeduction = async (deductionId: number) => {
+    setStoppingId(deductionId);
+    await fetch(`/api/ledger/deductions/${deductionId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stoppedWeek: weekStartOf(todayStr()) }),
+    });
+    await loadAll();
+    setStoppingId(null);
+  };
+
   if (loading) return <div className="text-center py-12 text-slate-500">Loading...</div>;
 
   return (
@@ -131,6 +185,7 @@ export default function OwnerLedgerPage() {
           {drivers.map((driver) => {
             const rows = entries[driver.id] || [];
             const driverPaidWeeks = paidWeeks[driver.id] || new Set<string>();
+            const driverDeductions = deductions[driver.id] || [];
             const weeks = groupByWeek(rows);
             const totals = rows.reduce(
               (acc, r) => ({
@@ -144,8 +199,10 @@ export default function OwnerLedgerPage() {
             );
             const payoutOwed = weeks
               .filter((w) => !driverPaidWeeks.has(w.weekStart))
-              .reduce((sum, w) => sum + w.net, 0);
+              .reduce((sum, w) => sum + w.net - deductionsForWeek(driverDeductions, w.weekStart).total, 0);
             const isSelected = selected === driver.id;
+            const activeDeductions = driverDeductions.filter((d) => !d.stoppedWeek);
+            const stoppedDeductions = driverDeductions.filter((d) => d.stoppedWeek);
 
             return (
               <div key={driver.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -173,7 +230,7 @@ export default function OwnerLedgerPage() {
                 {isSelected && (
                   <div className="border-t border-slate-100 p-4 bg-slate-50 space-y-3">
                     <p className="text-xs text-slate-400">
-                      Payout owed = GROSS × (1 − fee%) − fuel − cash already received. Repair expenses are tracked separately and don&apos;t affect payout.
+                      Payout owed = GROSS × (1 − fee%) − fuel − cash already received − recurring deductions. Repair expenses are tracked separately and don&apos;t affect payout.
                     </p>
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="bg-white rounded-lg p-2 border border-slate-200">
@@ -198,21 +255,94 @@ export default function OwnerLedgerPage() {
                       </div>
                     </div>
 
+                    <div className="bg-white rounded-lg border border-slate-200 p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-semibold text-slate-700">Recurring deductions</p>
+                        <button
+                          onClick={() => setAddingDeductionFor(addingDeductionFor === driver.id ? null : driver.id)}
+                          className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 active:bg-slate-200"
+                        >
+                          + Add deduction
+                        </button>
+                      </div>
+
+                      {activeDeductions.length === 0 && stoppedDeductions.length === 0 && (
+                        <p className="text-xs text-slate-400">None set up.</p>
+                      )}
+
+                      {activeDeductions.map((d) => (
+                        <div key={d.id} className="flex items-center justify-between text-sm">
+                          <span className="text-slate-700">{d.label} · since {d.startWeek}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-red-600">-{fmt(d.amountCents)}/wk</span>
+                            <button
+                              onClick={() => stopDeduction(d.id)}
+                              disabled={stoppingId === d.id}
+                              className="text-xs px-2 py-1 rounded-lg bg-red-50 text-red-600 border border-red-200 active:bg-red-100 disabled:opacity-50"
+                            >
+                              {stoppingId === d.id ? "..." : "Stop"}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {stoppedDeductions.length > 0 && (
+                        <div className="pt-1 border-t border-slate-100 space-y-1">
+                          {stoppedDeductions.map((d) => (
+                            <p key={d.id} className="text-xs text-slate-400">
+                              {d.label} -{fmt(d.amountCents)}/wk · {d.startWeek} → stopped {d.stoppedWeek}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+
+                      {addingDeductionFor === driver.id && (
+                        <div className="pt-2 border-t border-slate-100 flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Label (e.g. Escrow)"
+                            value={deductionForm.label}
+                            onChange={(e) => setDeductionForm({ ...deductionForm, label: e.target.value })}
+                            className="flex-1 h-9 rounded-lg border border-slate-300 px-2 text-sm"
+                          />
+                          <input
+                            type="number"
+                            step="0.01"
+                            placeholder="$/wk"
+                            value={deductionForm.amount}
+                            onChange={(e) => setDeductionForm({ ...deductionForm, amount: e.target.value })}
+                            className="w-24 h-9 rounded-lg border border-slate-300 px-2 text-sm"
+                          />
+                          <button
+                            onClick={() => addDeduction(driver.id)}
+                            className="px-3 h-9 rounded-lg bg-amber-600 text-white text-sm font-medium active:bg-amber-700"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
                     {weeks.length === 0 ? (
                       <p className="text-slate-400 text-sm text-center py-4">No entries yet</p>
                     ) : (
                       <div className="space-y-3">
                         {weeks.map((w) => {
                           const isPaid = driverPaidWeeks.has(w.weekStart);
+                          const weekDeductions = deductionsForWeek(driverDeductions, w.weekStart);
+                          const netAfterWeekDeductions = w.net - weekDeductions.total;
                           return (
                             <div key={w.weekStart} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                               <div className="px-3 py-2 flex items-center justify-between bg-slate-100 border-b border-slate-200">
                                 <div>
                                   <p className="text-sm font-semibold text-slate-800">{weekRangeLabel(w.weekStart)}</p>
                                   <p className="text-xs text-slate-400">Gross {fmt(w.gross)} · {num(w.hours)}h</p>
+                                  {weekDeductions.items.length > 0 && (
+                                    <p className="text-xs text-red-500">-{fmt(weekDeductions.total)} deductions</p>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <span className={`font-bold text-sm ${w.net < 0 ? "text-red-600" : "text-slate-800"}`}>{fmt(w.net)}</span>
+                                  <span className={`font-bold text-sm ${netAfterWeekDeductions < 0 ? "text-red-600" : "text-slate-800"}`}>{fmt(netAfterWeekDeductions)}</span>
                                   <button
                                     onClick={() => toggleWeekPaid(driver.id, w.weekStart, isPaid)}
                                     disabled={togglingWeek === w.weekStart}

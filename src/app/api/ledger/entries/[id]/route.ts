@@ -38,6 +38,10 @@ export async function PATCH(
     updates.fuelCostCents = Math.round((fuelPricePerGallon as number) * (gallons as number) * 100);
   }
 
+  if (Object.keys(updates).length > 0) {
+    updates.editedAt = new Date().toISOString();
+  }
+
   const [entry] = await db
     .update(ledgerEntries)
     .set(updates)
