@@ -1,8 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import InstallPrompt from "@/components/InstallPrompt";
+import {
+  checkBiometry,
+  authenticateWithBiometry,
+  getBiometricToken,
+  saveBiometricToken,
+  clearBiometricToken,
+  isNative,
+  type BiometryInfo,
+} from "@/lib/native";
+
+function biometryLabel(info: BiometryInfo): string {
+  if (info.biometryType === "faceId") return "Face ID";
+  if (info.biometryType === "touchId") return "Touch ID";
+  if (info.biometryType === "fingerprint") return "Fingerprint";
+  return "Biometric";
+}
+
+function biometryIcon(info: BiometryInfo): string {
+  if (info.biometryType === "faceId") return "👤";
+  if (info.biometryType === "touchId" || info.biometryType === "fingerprint") return "👆";
+  return "🔐";
+}
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -11,6 +33,58 @@ export default function LoginPage() {
   const [locked, setLocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Biometric state
+  const [biometryInfo, setBiometryInfo] = useState<BiometryInfo | null>(null);
+  const [storedToken, setStoredToken] = useState<string | null>(null);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+  const [showOffer, setShowOffer] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+
+  const doBiometricLogin = useCallback(async (token: string) => {
+    setBiometricLoading(true);
+    setError("");
+    const authed = await authenticateWithBiometry("Sign in to TruckAudit");
+    if (!authed) {
+      setBiometricLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch("/api/auth/biometric-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        router.push(data.role === "owner" ? "/owner" : "/driver");
+        return;
+      }
+      // Token invalid/expired — clear it
+      await clearBiometricToken();
+      setStoredToken(null);
+      setError("Biometric session expired. Please sign in with your password.");
+    } catch {
+      setError("Sign in failed. Try again.");
+    }
+    setBiometricLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    async function initBiometric() {
+      const info = await checkBiometry();
+      setBiometryInfo(info);
+      if (info.available) {
+        const token = await getBiometricToken();
+        setStoredToken(token);
+        if (token) {
+          // Auto-trigger on app open
+          doBiometricLogin(token);
+        }
+      }
+    }
+    initBiometric();
+  }, [doBiometricLogin]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -46,25 +120,95 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-      if (data.role === "owner") {
-        router.push("/owner");
-      } else {
-        router.push("/driver");
+      const redirectPath = data.role === "owner" ? "/owner" : "/driver";
+
+      // Offer biometric setup if native + available + not yet set up
+      if (isNative() && biometryInfo?.available && !storedToken) {
+        setPendingPath(redirectPath);
+        setShowOffer(true);
+        setLoading(false);
+        return;
       }
+
+      router.push(redirectPath);
     } catch {
       setError("Something went wrong. Try again.");
       setLoading(false);
     }
   };
 
+  const handleEnableBiometric = async () => {
+    try {
+      const platform = typeof window !== "undefined"
+        ? (window as unknown as { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.() ?? null
+        : null;
+      const res = await fetch("/api/auth/device", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform }),
+      });
+      if (res.ok) {
+        const { token } = await res.json();
+        await saveBiometricToken(token);
+      }
+    } catch { /* non-fatal */ }
+    router.push(pendingPath!);
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
+      {/* Biometric offer sheet */}
+      {showOffer && biometryInfo && (
+        <div className="fixed inset-0 bg-black/50 flex items-end z-50">
+          <div className="w-full bg-white rounded-t-2xl p-6 pb-10 max-w-sm mx-auto">
+            <div className="text-5xl text-center mb-4">{biometryIcon(biometryInfo)}</div>
+            <h2 className="text-xl font-bold text-slate-900 text-center mb-2">
+              Enable {biometryLabel(biometryInfo)}?
+            </h2>
+            <p className="text-slate-500 text-sm text-center mb-6">
+              Sign in instantly next time without typing your password.
+            </p>
+            <button
+              onClick={handleEnableBiometric}
+              className="w-full h-12 rounded-xl bg-amber-600 text-white font-bold text-lg mb-3 active:bg-amber-700"
+            >
+              Enable {biometryLabel(biometryInfo)}
+            </button>
+            <button
+              onClick={() => router.push(pendingPath!)}
+              className="w-full h-12 rounded-xl text-slate-500 font-medium text-base"
+            >
+              Not Now
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <img src="/logo.png" alt="TruckAudit" className="w-24 h-24 mx-auto mb-3" />
           <h1 className="text-3xl font-bold text-slate-900">TruckAudit</h1>
           <p className="text-slate-500 mt-1">Sign in to your account</p>
         </div>
+
+        {/* Biometric quick-sign-in button */}
+        {biometryInfo?.available && storedToken && (
+          <button
+            type="button"
+            onClick={() => doBiometricLogin(storedToken)}
+            disabled={biometricLoading}
+            className="w-full h-14 rounded-xl border-2 border-amber-600 text-amber-700 font-bold text-lg flex items-center justify-center gap-2 mb-5 disabled:opacity-50"
+          >
+            {biometricLoading ? (
+              <span className="animate-pulse">Authenticating…</span>
+            ) : (
+              <>
+                <span className="text-2xl">{biometryIcon(biometryInfo)}</span>
+                Sign in with {biometryLabel(biometryInfo)}
+              </>
+            )}
+          </button>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -108,7 +252,7 @@ export default function LoginPage() {
             disabled={loading || !username.trim() || !password}
             className="w-full h-12 rounded-xl bg-amber-600 text-white text-lg font-bold disabled:opacity-40 active:bg-amber-700 transition-colors mt-2"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Signing in…" : "Sign In"}
           </button>
         </form>
 
@@ -127,13 +271,9 @@ export default function LoginPage() {
       <footer className="mt-8 text-center text-sm text-slate-400 pb-4">
         <p>&copy; 2026 TruckAudit. All rights reserved.</p>
         <span className="mx-1">·</span>
-        <a href="/terms" className="text-slate-500 hover:text-amber-600 underline">
-          Terms
-        </a>
+        <a href="/terms" className="text-slate-500 hover:text-amber-600 underline">Terms</a>
         <span className="mx-1">·</span>
-        <a href="/privacy" className="text-slate-500 hover:text-amber-600 underline">
-          Privacy
-        </a>
+        <a href="/privacy" className="text-slate-500 hover:text-amber-600 underline">Privacy</a>
       </footer>
     </div>
   );

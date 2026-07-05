@@ -17,6 +17,10 @@ const config: CapacitorConfig = {
     Geolocation: {
       permissions: ["location"],
     },
+    BiometricAuth: {
+      // iOS: NSFaceIDUsageDescription added to Info.plist by plugin automatically
+      // Android: USE_BIOMETRIC permission added to AndroidManifest.xml by plugin
+    },
   },
   ios: {
     contentInset: "automatic",

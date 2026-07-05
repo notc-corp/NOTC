@@ -234,6 +234,17 @@ export const ledgerWeeklyPayments = pgTable("ledger_weekly_payments", {
   paidAt: text("paid_at").notNull().$default(() => new Date().toISOString()),
 });
 
+export const deviceTokens = pgTable("device_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  companyId: integer("company_id").references(() => companies.id),
+  tokenHash: text("token_hash").notNull().unique(),
+  platform: text("platform"),
+  createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
+  lastUsedAt: text("last_used_at"),
+  expiresAt: text("expires_at").notNull(),
+});
+
 export const salaryEntries = pgTable("salary_entries", {
   id: serial("id").primaryKey(),
   companyId: integer("company_id").references(() => companies.id),

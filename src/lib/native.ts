@@ -46,6 +46,63 @@ export async function takePhoto(): Promise<string | null> {
   });
 }
 
+export interface BiometryInfo {
+  available: boolean;
+  biometryType: "none" | "touchId" | "faceId" | "fingerprint" | "face" | "iris";
+}
+
+export async function checkBiometry(): Promise<BiometryInfo> {
+  if (!isNative()) return { available: false, biometryType: "none" };
+  try {
+    const { BiometricAuth } = await import("@aparajita/capacitor-biometric-auth");
+    const result = await BiometricAuth.checkBiometry();
+    const typeMap: Record<number, BiometryInfo["biometryType"]> = {
+      0: "none", 1: "touchId", 2: "faceId", 3: "fingerprint", 4: "face", 5: "iris",
+    };
+    return { available: result.isAvailable, biometryType: typeMap[result.biometryType] ?? "none" };
+  } catch {
+    return { available: false, biometryType: "none" };
+  }
+}
+
+export async function authenticateWithBiometry(reason: string): Promise<boolean> {
+  if (!isNative()) return false;
+  try {
+    const { BiometricAuth } = await import("@aparajita/capacitor-biometric-auth");
+    await BiometricAuth.authenticate({ reason, cancelTitle: "Cancel", allowDeviceCredential: false });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function getBiometricToken(): Promise<string | null> {
+  if (!isNative()) return null;
+  try {
+    const { Preferences } = await import("@capacitor/preferences");
+    const { value } = await Preferences.get({ key: "biometric_token" });
+    return value;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveBiometricToken(token: string): Promise<void> {
+  if (!isNative()) return;
+  try {
+    const { Preferences } = await import("@capacitor/preferences");
+    await Preferences.set({ key: "biometric_token", value: token });
+  } catch { /* ignore */ }
+}
+
+export async function clearBiometricToken(): Promise<void> {
+  if (!isNative()) return;
+  try {
+    const { Preferences } = await import("@capacitor/preferences");
+    await Preferences.remove({ key: "biometric_token" });
+  } catch { /* ignore */ }
+}
+
 export interface GeoPosition {
   lat: number;
   lng: number;
