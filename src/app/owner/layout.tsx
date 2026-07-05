@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/owner/salary", label: "Salary", icon: "💵" },
   { href: "/owner/ledger", label: "Ledger", icon: "📒" },
   { href: "/owner/trucks/accounting", label: "Accounting", icon: "📑" },
+  { href: "/owner/billing", label: "Billing", icon: "💳" },
   { href: "/owner/settings", label: "Settings", icon: "⚙️" },
 ];
 

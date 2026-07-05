@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
         </Link>
 
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Privacy Policy</h1>
-        <p className="text-slate-500 text-sm mb-8">Last updated: March 20, 2026</p>
+        <p className="text-slate-500 text-sm mb-8">Last updated: July 1, 2026</p>
 
         <div className="space-y-8 text-slate-700 leading-relaxed">
           {/* Intro */}
@@ -132,6 +132,25 @@ export default function PrivacyPolicyPage() {
             </ul>
           </section>
 
+          {/* Sub-processors */}
+          <section>
+            <h2 className="text-xl font-semibold text-slate-900 mb-3">Third-Party Services</h2>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Vercel</strong> — web hosting</li>
+              <li><strong>Neon</strong> — database hosting</li>
+              <li><strong>Anthropic</strong> — AI OCR for receipt and odometer photos</li>
+              <li><strong>Stripe</strong> — payment processing (PCI-DSS compliant; we never store card numbers)</li>
+              <li><strong>Mapbox</strong> — GPS map rendering</li>
+              <li><strong>Telegram</strong> — optional push alerts (only if you configure a bot)</li>
+            </ul>
+          </section>
+
+          {/* Billing */}
+          <section>
+            <h2 className="text-xl font-semibold text-slate-900 mb-3">Subscription & Billing</h2>
+            <p>Subscription payments are processed by Stripe. We store only your Stripe Customer ID to manage your subscription — we never store full card numbers or CVV codes. Billing records may be retained as required for tax and accounting purposes.</p>
+          </section>
+
           {/* No Selling Data */}
           <section>
             <h2 className="text-xl font-semibold text-slate-900 mb-3">We Do Not Sell Your Data</h2>
@@ -139,6 +158,18 @@ export default function PrivacyPolicyPage() {
               We do not sell, rent, or trade your personal information to anyone. Your data
               is used only for running TruckAudit and nothing else.
             </p>
+          </section>
+
+          {/* Your Rights */}
+          <section>
+            <h2 className="text-xl font-semibold text-slate-900 mb-3">Your Rights</h2>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Access:</strong> request a copy of all your data</li>
+              <li><strong>Correction:</strong> correct any inaccurate data via the app</li>
+              <li><strong>Deletion:</strong> request deletion of your account and all associated data</li>
+              <li><strong>Export:</strong> download your trip, expense, and ledger data as CSV</li>
+            </ul>
+            <p className="mt-2">To exercise these rights, email <a href="mailto:support@truckaudit.com" className="text-amber-600 underline">support@truckaudit.com</a>.</p>
           </section>
 
           {/* Cookies */}

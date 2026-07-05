@@ -9,6 +9,12 @@ export const companies = pgTable("companies", {
   telegramChatId: text("telegram_chat_id"),
   createdAt: text("created_at").notNull().$default(() => new Date().toISOString()),
   isActive: boolean("is_active").notNull().default(true),
+  // Billing
+  trialEndsAt: text("trial_ends_at"),
+  subscriptionStatus: text("subscription_status").notNull().default("trial"),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  planName: text("plan_name").notNull().default("trial"),
 });
 
 export const trucks = pgTable("trucks", {

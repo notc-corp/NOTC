@@ -115,12 +115,24 @@ export default function LoginPage() {
         <div className="mt-4">
           <InstallPrompt />
         </div>
+
+        <p className="text-center text-sm text-slate-500 mt-5">
+          New company?{" "}
+          <a href="/signup" className="text-amber-600 font-medium">
+            Create free account →
+          </a>
+        </p>
       </div>
 
       <footer className="mt-8 text-center text-sm text-slate-400 pb-4">
         <p>&copy; 2026 TruckAudit. All rights reserved.</p>
+        <span className="mx-1">·</span>
+        <a href="/terms" className="text-slate-500 hover:text-amber-600 underline">
+          Terms
+        </a>
+        <span className="mx-1">·</span>
         <a href="/privacy" className="text-slate-500 hover:text-amber-600 underline">
-          Privacy Policy
+          Privacy
         </a>
       </footer>
     </div>
