@@ -209,10 +209,15 @@ export default function DriverLedgerPage() {
   const previewPerHour = previewNet != null && form.hours ? previewNet / parseFloat(form.hours) : null;
 
   const weeks = groupByWeek(entries);
-  const netAfterDeductions = (w: WeekGroup) => w.net - deductionsForWeek(deductions, w.weekStart).total;
-  const payoutOwed = weeks
+  const afterFuelForWeek = (w: WeekGroup) => w.net - deductionsForWeek(deductions, w.weekStart).total;
+  const settlementForWeek = (w: WeekGroup) =>
+    Math.round(w.gross * (1 - feePercent / 100)) - deductionsForWeek(deductions, w.weekStart).total;
+  const settlementOwed = weeks
     .filter((w) => !paidWeeks.has(w.weekStart))
-    .reduce((sum, w) => sum + netAfterDeductions(w), 0);
+    .reduce((sum, w) => sum + settlementForWeek(w), 0);
+  const afterFuelOwed = weeks
+    .filter((w) => !paidWeeks.has(w.weekStart))
+    .reduce((sum, w) => sum + afterFuelForWeek(w), 0);
 
   const thisWeekStart = weekStartOf(today());
   const lastWeekDate = new Date(thisWeekStart + "T00:00:00");
@@ -222,6 +227,10 @@ export default function DriverLedgerPage() {
   const lastWeek = weeks.find((w) => w.weekStart === lastWeekStart);
   const thisWeekDeductions = deductionsForWeek(deductions, thisWeekStart).total;
   const lastWeekDeductions = deductionsForWeek(deductions, lastWeekStart).total;
+  const thisWeekSettlement = Math.round((thisWeek?.gross ?? 0) * (1 - feePercent / 100)) - thisWeekDeductions;
+  const thisWeekAfterFuel = (thisWeek?.net ?? 0) - thisWeekDeductions;
+  const lastWeekSettlement = Math.round((lastWeek?.gross ?? 0) * (1 - feePercent / 100)) - lastWeekDeductions;
+  const lastWeekAfterFuel = (lastWeek?.net ?? 0) - lastWeekDeductions;
 
   if (loading) {
     return (
@@ -248,21 +257,25 @@ export default function DriverLedgerPage() {
 
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 p-5 text-white shadow-md">
         <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10" />
-        <p className="text-amber-100 text-sm font-medium">Payout owed (all time)</p>
-        <p className="text-4xl font-bold tracking-tight mt-1">{fmt(payoutOwed)}</p>
-        <p className="text-amber-100 text-xs mt-2">After {feePercent}% dispatch fee, fuel, cash received & deductions</p>
+        <p className="text-amber-100 text-sm font-medium">Settlement owed</p>
+        <p className="text-4xl font-bold tracking-tight mt-1">{fmt(settlementOwed)}</p>
+        <p className="text-amber-100 text-xs mt-2">Matches statement · {feePercent}% fee + deductions</p>
+        <div className="mt-3 pt-3 border-t border-white/20 flex items-baseline justify-between">
+          <p className="text-amber-100 text-sm">After fuel & expenses</p>
+          <p className="text-2xl font-bold">{fmt(afterFuelOwed)}</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
           <p className="text-xs text-slate-400">This week</p>
-          <p className="text-lg font-bold text-slate-800">{fmt((thisWeek?.net ?? 0) - thisWeekDeductions)}</p>
-          <p className="text-xs text-slate-400">Gross {fmt(thisWeek?.gross ?? 0)}{thisWeekDeductions ? ` · -${fmt(thisWeekDeductions)} deductions` : ""}</p>
+          <p className="text-lg font-bold text-slate-800">{fmt(thisWeekSettlement)}</p>
+          <p className="text-xs text-slate-400">After fuel {fmt(thisWeekAfterFuel)}</p>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
           <p className="text-xs text-slate-400">Last week</p>
-          <p className="text-lg font-bold text-slate-800">{fmt((lastWeek?.net ?? 0) - lastWeekDeductions)}</p>
-          <p className="text-xs text-slate-400">Gross {fmt(lastWeek?.gross ?? 0)}{lastWeekDeductions ? ` · -${fmt(lastWeekDeductions)} deductions` : ""}</p>
+          <p className="text-lg font-bold text-slate-800">{fmt(lastWeekSettlement)}</p>
+          <p className="text-xs text-slate-400">After fuel {fmt(lastWeekAfterFuel)}</p>
         </div>
       </div>
 
@@ -429,10 +442,11 @@ export default function DriverLedgerPage() {
             {weeks.map((w) => {
               const isPaid = paidWeeks.has(w.weekStart);
               const weekDeductions = deductionsForWeek(deductions, w.weekStart);
-              const netAfterWeekDeductions = w.net - weekDeductions.total;
+              const weekSettlement = Math.round(w.gross * (1 - feePercent / 100)) - weekDeductions.total;
+              const weekAfterFuel = w.net - weekDeductions.total;
               return (
                 <div key={w.weekStart} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                  <div className="p-4 flex items-center justify-between bg-slate-50 border-b border-slate-100">
+                  <div className="p-4 flex items-start justify-between bg-slate-50 border-b border-slate-100">
                     <div>
                       <p className="font-semibold text-slate-800">{weekRangeLabel(w.weekStart)}</p>
                       <p className="text-xs text-slate-400">Gross {fmt(w.gross)} · {w.hours ? `${w.hours}h` : "—"}</p>
@@ -441,19 +455,26 @@ export default function DriverLedgerPage() {
                           -{fmt(weekDeductions.total)} ({weekDeductions.items.map((d) => d.label).join(", ")})
                         </p>
                       )}
+                      <div className="flex gap-4 mt-1.5">
+                        <div>
+                          <p className="text-xs text-slate-400">Settlement</p>
+                          <p className={`font-bold ${weekSettlement < 0 ? "text-red-600" : "text-slate-800"}`}>{fmt(weekSettlement)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400">After fuel</p>
+                          <p className={`font-bold ${weekAfterFuel < 0 ? "text-red-600" : "text-slate-500"}`}>{fmt(weekAfterFuel)}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`font-bold ${netAfterWeekDeductions < 0 ? "text-red-600" : "text-slate-800"}`}>{fmt(netAfterWeekDeductions)}</span>
-                      <button
-                        onClick={() => toggleWeekPaid(w.weekStart, isPaid)}
-                        disabled={togglingWeek === w.weekStart}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap disabled:opacity-50 ${
-                          isPaid ? "bg-green-100 text-green-700 border border-green-300" : "bg-amber-600 text-white active:bg-amber-700"
-                        }`}
-                      >
-                        {togglingWeek === w.weekStart ? "..." : isPaid ? "✅ Paid" : "Mark Paid"}
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => toggleWeekPaid(w.weekStart, isPaid)}
+                      disabled={togglingWeek === w.weekStart}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap disabled:opacity-50 ${
+                        isPaid ? "bg-green-100 text-green-700 border border-green-300" : "bg-amber-600 text-white active:bg-amber-700"
+                      }`}
+                    >
+                      {togglingWeek === w.weekStart ? "..." : isPaid ? "✅ Paid" : "Mark Paid"}
+                    </button>
                   </div>
                   <div className="divide-y divide-slate-100">
                     {w.entries.map((e) => (
