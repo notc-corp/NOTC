@@ -121,6 +121,7 @@ export const inspections = pgTable("inspections", {
   safeToOperate: boolean("safe_to_operate"),
   hasDefects: boolean("has_defects").notNull().default(false),
   hasOutOfService: boolean("has_out_of_service").notNull().default(false),
+  signaturePath: text("signature_path"),
   completedAt: text("completed_at").notNull().$default(() => new Date().toISOString()),
 });
 
