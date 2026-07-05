@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ledgerEntries, users } from "@/db/schema";
 import { eq, and, asc } from "drizzle-orm";
+import { getSubscriptionState } from "@/lib/subscription";
 
 function withComputed(rows: (typeof ledgerEntries.$inferSelect)[], feePercent: number) {
   let prevOdometer: number | null = null;
@@ -66,6 +67,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (session.companyId) {
+    const sub = await getSubscriptionState(session.companyId);
+    if (!sub.canWrite) {
+      return NextResponse.json({ error: "Subscription required to add ledger entries." }, { status: 402 });
+    }
+  }
 
   const body = await req.json();
   const driverId = session.role === "driver" ? session.userId : body.driverId;

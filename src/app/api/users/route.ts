@@ -3,6 +3,7 @@ import { getSession, hashPassword } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { getSubscriptionState } from "@/lib/subscription";
 
 export async function GET() {
   const session = await getSession();
@@ -40,6 +41,13 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session.userId || session.role !== "owner") {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  }
+
+  if (session.companyId) {
+    const sub = await getSubscriptionState(session.companyId);
+    if (!sub.canWrite) {
+      return NextResponse.json({ error: "Subscription required to add drivers." }, { status: 402 });
+    }
   }
 
   const { name, username, password, truckNumber, phone } = await req.json();

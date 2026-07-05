@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import { desc, eq } from "drizzle-orm";
 import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
+import { getSubscriptionState } from "@/lib/subscription";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -24,6 +25,7 @@ export async function GET(req: NextRequest) {
       hasDefects: schema.inspections.hasDefects,
       hasOutOfService: schema.inspections.hasOutOfService,
       completedAt: schema.inspections.completedAt,
+      signaturePath: schema.inspections.signaturePath,
       companyId: schema.users.companyId,
     })
     .from(schema.inspections)
@@ -44,6 +46,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session.userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (session.companyId) {
+    const sub = await getSubscriptionState(session.companyId);
+    if (!sub.canWrite) {
+      return NextResponse.json({ error: "Subscription required to submit inspections." }, { status: 402 });
+    }
+  }
 
   const body = await req.json();
   const { type, tripId, items, signatureDataUrl } = body as {

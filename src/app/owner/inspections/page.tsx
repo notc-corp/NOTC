@@ -12,6 +12,7 @@ interface Inspection {
   hasDefects: boolean;
   hasOutOfService: boolean;
   completedAt: string;
+  signaturePath: string | null;
 }
 
 export default function InspectionsPage() {
@@ -83,6 +84,16 @@ export default function InspectionsPage() {
                   {insp.safeToOperate ? "YES" : "NO"}
                 </span>
               </div>
+              {insp.signaturePath && (
+                <div className="mt-3 border-t border-slate-100 pt-3">
+                  <p className="text-xs text-slate-400 mb-1.5 font-medium uppercase tracking-wide">Driver signature</p>
+                  <img
+                    src={insp.signaturePath}
+                    alt="Driver signature"
+                    className="h-16 max-w-[200px] object-contain bg-slate-50 rounded border border-slate-200 p-1"
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>

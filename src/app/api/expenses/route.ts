@@ -5,6 +5,7 @@ import { expenses, trips } from "@/db/schema";
 import { eq, and, desc, gte } from "drizzle-orm";
 import { saveUpload } from "@/lib/upload";
 import { notifyExpenseAdded } from "@/lib/notifications";
+import { getSubscriptionState } from "@/lib/subscription";
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -51,6 +52,13 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session.userId) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  if (session.companyId) {
+    const sub = await getSubscriptionState(session.companyId);
+    if (!sub.canWrite) {
+      return NextResponse.json({ error: "Subscription required to add expenses." }, { status: 402 });
+    }
   }
 
   const contentType = req.headers.get("content-type") || "";

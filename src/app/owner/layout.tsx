@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
+interface BillingBanner {
+  status: string;
+  trialDaysLeft: number | null;
+}
+
 const NAV_ITEMS = [
   { href: "/owner", label: "Dashboard", icon: "📊" },
   { href: "/owner/drivers", label: "Drivers", icon: "👤" },
@@ -28,6 +33,7 @@ export default function OwnerLayout({
 }) {
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [billing, setBilling] = useState<BillingBanner | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -39,6 +45,19 @@ export default function OwnerLayout({
           router.push("/login");
         } else {
           setUser(data.user);
+          fetch("/api/billing/info")
+            .then((r) => r.json())
+            .then((d) => {
+              if (d.subscriptionStatus) {
+                const msLeft = d.trialEndsAt ? new Date(d.trialEndsAt).getTime() - Date.now() : null;
+                const daysLeft = msLeft !== null ? Math.ceil(msLeft / 86400000) : null;
+                const status = d.subscriptionStatus === "trial" && daysLeft !== null && daysLeft <= 0
+                  ? "expired"
+                  : d.subscriptionStatus;
+                setBilling({ status, trialDaysLeft: daysLeft });
+              }
+            })
+            .catch(() => {});
         }
         setLoading(false);
       });
@@ -93,6 +112,51 @@ export default function OwnerLayout({
           </Link>
         ))}
       </nav>
+
+      {/* Subscription banner */}
+      {billing && billing.status !== "active" && (
+        <div className={`px-4 py-2.5 text-sm font-medium flex items-center justify-between gap-3 ${
+          billing.status === "expired" || billing.status === "cancelled"
+            ? "bg-red-600 text-white"
+            : billing.status === "past_due"
+            ? "bg-red-500 text-white"
+            : billing.trialDaysLeft !== null && billing.trialDaysLeft <= 7
+            ? "bg-amber-500 text-white"
+            : "bg-amber-50 text-amber-800 border-b border-amber-200"
+        }`}>
+          <span>
+            {billing.status === "expired"
+              ? "Your free trial has expired. Add a subscription to continue using TruckAudit."
+              : billing.status === "cancelled"
+              ? "Subscription cancelled. Resubscribe to regain full access."
+              : billing.status === "past_due"
+              ? "Payment failed. Please update your payment method to avoid interruption."
+              : billing.trialDaysLeft !== null && billing.trialDaysLeft <= 7
+              ? `Trial expires in ${billing.trialDaysLeft} day${billing.trialDaysLeft !== 1 ? "s" : ""}. Subscribe to keep access.`
+              : `Free trial — ${billing.trialDaysLeft} days remaining.`}
+          </span>
+          {billing.status !== "past_due" && (
+            <Link
+              href="/owner/billing"
+              className={`shrink-0 px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
+                billing.status === "expired" || billing.status === "cancelled"
+                  ? "bg-white text-red-700 hover:bg-red-50"
+                  : "bg-amber-700 text-white hover:bg-amber-800"
+              }`}
+            >
+              Subscribe
+            </Link>
+          )}
+          {billing.status === "past_due" && (
+            <Link
+              href="/owner/billing"
+              className="shrink-0 px-3 py-1 rounded-lg text-xs font-bold bg-white text-red-700 hover:bg-red-50 transition-colors"
+            >
+              Fix payment
+            </Link>
+          )}
+        </div>
+      )}
 
       <main className="p-4 max-w-6xl mx-auto">{children}</main>
       <footer className="text-center text-sm text-slate-400 py-6">
