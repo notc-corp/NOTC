@@ -57,6 +57,7 @@ interface WeekGroup {
   weekStart: string;
   entries: LedgerEntry[];
   gross: number;
+  cashReceived: number;
   net: number;
   hours: number;
 }
@@ -72,6 +73,7 @@ function groupByWeek(entries: LedgerEntry[], feePercent: number): WeekGroup[] {
     weekStart,
     entries: weekEntries,
     gross: weekEntries.reduce((s, e) => s + (e.grossCents ?? 0), 0),
+    cashReceived: weekEntries.reduce((s, e) => s + (e.cashReceivedCents ?? 0), 0),
     net: weekEntries.reduce((s, e) => s + (e.netCents ?? 0), 0),
     hours: weekEntries.reduce((s, e) => s + (e.workingHours ?? 0), 0),
     feePercent,
@@ -200,7 +202,7 @@ export default function OwnerLedgerPage() {
             );
             const settlementOwed = weeks
               .filter((w) => !driverPaidWeeks.has(w.weekStart))
-              .reduce((sum, w) => sum + Math.round(w.gross * (1 - driver.ledgerFeePercent / 100)) - deductionsForWeek(driverDeductions, w.weekStart).total, 0);
+              .reduce((sum, w) => sum + Math.round(w.gross * (1 - driver.ledgerFeePercent / 100)) - w.cashReceived - deductionsForWeek(driverDeductions, w.weekStart).total, 0);
             const afterFuelOwed = weeks
               .filter((w) => !driverPaidWeeks.has(w.weekStart))
               .reduce((sum, w) => sum + w.net - deductionsForWeek(driverDeductions, w.weekStart).total, 0);
@@ -337,7 +339,7 @@ export default function OwnerLedgerPage() {
                         {weeks.map((w) => {
                           const isPaid = driverPaidWeeks.has(w.weekStart);
                           const weekDeductions = deductionsForWeek(driverDeductions, w.weekStart);
-                          const weekSettlement = Math.round(w.gross * (1 - driver.ledgerFeePercent / 100)) - weekDeductions.total;
+                          const weekSettlement = Math.round(w.gross * (1 - driver.ledgerFeePercent / 100)) - w.cashReceived - weekDeductions.total;
                           const weekAfterFuel = w.net - weekDeductions.total;
                           return (
                             <div key={w.weekStart} className="bg-white rounded-lg border border-slate-200 overflow-hidden">

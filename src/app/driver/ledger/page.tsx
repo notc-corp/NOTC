@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface LedgerEntry {
   id: number;
@@ -32,7 +32,6 @@ interface Deduction {
 const fmt = (cents: number | null) => (cents == null ? "—" : `$${(cents / 100).toFixed(2)}`);
 const today = () => new Date().toISOString().slice(0, 10);
 
-// Accepts plain numbers or "+"-separated sums like "150+200+300", with an optional trailing "=".
 function parseGrossFormula(input: string): number | null {
   const cleaned = input.trim().replace(/=\s*$/, "");
   if (!cleaned) return null;
@@ -48,7 +47,6 @@ function deductionsForWeek(deductions: Deduction[], weekStart: string) {
   return { items, total: items.reduce((s, d) => s + d.amountCents, 0) };
 }
 
-// Weeks run Sunday–Saturday.
 const weekStartOf = (dateStr: string) => {
   const d = new Date(dateStr + "T00:00:00");
   d.setDate(d.getDate() - d.getDay());
@@ -97,6 +95,29 @@ const fieldLabel = "block text-xs font-semibold text-slate-500 uppercase trackin
 const fieldInput =
   "w-full h-12 rounded-xl bg-white px-4 text-slate-800 border border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 focus:outline-none transition-colors";
 
+function CamBtn({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading}
+      className="absolute right-3 top-3 w-6 h-6 flex items-center justify-center text-slate-400 active:text-amber-600 disabled:opacity-40"
+    >
+      {loading ? (
+        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+        </svg>
+      ) : (
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 export default function DriverLedgerPage() {
   const [feePercent, setFeePercent] = useState(12);
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
@@ -107,6 +128,7 @@ export default function DriverLedgerPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState<"pump" | "odometer" | null>(null);
   const [form, setForm] = useState({
     entryDate: today(),
     odometer: "",
@@ -118,6 +140,9 @@ export default function DriverLedgerPage() {
     repairCost: "",
     repairNote: "",
   });
+
+  const pumpCameraRef = useRef<HTMLInputElement>(null);
+  const odometerCameraRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const [meRes, entriesRes, weeksRes, deductionsRes] = await Promise.all([
@@ -134,6 +159,37 @@ export default function DriverLedgerPage() {
   };
 
   useEffect(() => { load(); }, []);
+
+  const handleCameraFile = async (file: File, type: "pump" | "odometer") => {
+    setOcrLoading(type);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      const [header, base64] = dataUrl.split(",");
+      const mediaType = header.match(/:(.*?);/)?.[1] ?? "image/jpeg";
+      try {
+        const res = await fetch("/api/ledger/ocr", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: base64, mediaType, type }),
+        });
+        const data = await res.json();
+        if (type === "pump") {
+          setForm((f) => ({
+            ...f,
+            gallons: data.gallons != null ? String(data.gallons) : f.gallons,
+            fuelPrice: data.pricePerGallon != null ? String(data.pricePerGallon) : f.fuelPrice,
+          }));
+        } else {
+          setForm((f) => ({ ...f, odometer: data.odometer != null ? String(data.odometer) : f.odometer }));
+        }
+      } catch {
+        // silently fail — user can type manually
+      }
+      setOcrLoading(null);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const toggleWeekPaid = async (weekStart: string, isPaid: boolean) => {
     setTogglingWeek(weekStart);
@@ -198,6 +254,32 @@ export default function DriverLedgerPage() {
     setSubmitting(false);
   };
 
+  const exportCSV = () => {
+    const headers = ["Date", "Odometer", "Gallons", "MPG", "Fuel $", "Gross $", "Cash recv $", "Net/Payout $", "Hours", "$/hr", "Repair $", "Repair note"];
+    const rows = [...entries].reverse().map((e) => [
+      e.entryDate,
+      e.odometer ?? "",
+      e.gallons ?? "",
+      e.mpg?.toFixed(1) ?? "",
+      e.fuelCostCents != null ? (e.fuelCostCents / 100).toFixed(2) : "",
+      e.grossCents != null ? (e.grossCents / 100).toFixed(2) : "",
+      e.cashReceivedCents != null ? (e.cashReceivedCents / 100).toFixed(2) : "",
+      e.netCents != null ? (e.netCents / 100).toFixed(2) : "",
+      e.workingHours ?? "",
+      e.moneyPerHour != null ? (e.moneyPerHour / 100).toFixed(2) : "",
+      e.cashExpenseCents != null ? (e.cashExpenseCents / 100).toFixed(2) : "",
+      e.cashExpenseNote ?? "",
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(",")).join("\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const previewFuelCost =
     form.fuelPrice && form.gallons ? Math.round(parseFloat(form.fuelPrice) * parseFloat(form.gallons) * 100) : null;
   const previewNet =
@@ -209,9 +291,11 @@ export default function DriverLedgerPage() {
   const previewPerHour = previewNet != null && form.hours ? previewNet / parseFloat(form.hours) : null;
 
   const weeks = groupByWeek(entries);
-  const afterFuelForWeek = (w: WeekGroup) => w.net - deductionsForWeek(deductions, w.weekStart).total;
+  // Settlement = gross × (1−fee%) − cash already received − recurring deductions
   const settlementForWeek = (w: WeekGroup) =>
-    Math.round(w.gross * (1 - feePercent / 100)) - deductionsForWeek(deductions, w.weekStart).total;
+    Math.round(w.gross * (1 - feePercent / 100)) - w.cashReceived - deductionsForWeek(deductions, w.weekStart).total;
+  // After fuel = settlement − fuel paid at pump (driver's own expense)
+  const afterFuelForWeek = (w: WeekGroup) => w.net - deductionsForWeek(deductions, w.weekStart).total;
   const settlementOwed = weeks
     .filter((w) => !paidWeeks.has(w.weekStart))
     .reduce((sum, w) => sum + settlementForWeek(w), 0);
@@ -227,9 +311,11 @@ export default function DriverLedgerPage() {
   const lastWeek = weeks.find((w) => w.weekStart === lastWeekStart);
   const thisWeekDeductions = deductionsForWeek(deductions, thisWeekStart).total;
   const lastWeekDeductions = deductionsForWeek(deductions, lastWeekStart).total;
-  const thisWeekSettlement = Math.round((thisWeek?.gross ?? 0) * (1 - feePercent / 100)) - thisWeekDeductions;
+  const thisWeekSettlement =
+    Math.round((thisWeek?.gross ?? 0) * (1 - feePercent / 100)) - (thisWeek?.cashReceived ?? 0) - thisWeekDeductions;
   const thisWeekAfterFuel = (thisWeek?.net ?? 0) - thisWeekDeductions;
-  const lastWeekSettlement = Math.round((lastWeek?.gross ?? 0) * (1 - feePercent / 100)) - lastWeekDeductions;
+  const lastWeekSettlement =
+    Math.round((lastWeek?.gross ?? 0) * (1 - feePercent / 100)) - (lastWeek?.cashReceived ?? 0) - lastWeekDeductions;
   const lastWeekAfterFuel = (lastWeek?.net ?? 0) - lastWeekDeductions;
 
   if (loading) {
@@ -245,14 +331,48 @@ export default function DriverLedgerPage() {
 
   return (
     <div className="space-y-6">
+      {/* Hidden camera inputs */}
+      <input
+        ref={pumpCameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleCameraFile(f, "pump");
+          e.target.value = "";
+        }}
+      />
+      <input
+        ref={odometerCameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleCameraFile(f, "odometer");
+          e.target.value = "";
+        }}
+      />
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">📒 Gross Ledger</h1>
-        <button
-          onClick={() => (showForm ? resetForm() : setShowForm(true))}
-          className="bg-amber-600 text-white px-4 py-2 rounded-xl font-medium shadow-sm active:scale-95 active:bg-amber-700 transition-all"
-        >
-          {showForm ? "Cancel" : "+ Add"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportCSV}
+            className="text-slate-500 px-3 py-2 rounded-xl text-sm font-medium border border-slate-200 bg-white active:bg-slate-50"
+          >
+            ⬇ CSV
+          </button>
+          <button
+            onClick={() => (showForm ? resetForm() : setShowForm(true))}
+            className="bg-amber-600 text-white px-4 py-2 rounded-xl font-medium shadow-sm active:scale-95 active:bg-amber-700 transition-all"
+          >
+            {showForm ? "Cancel" : "+ Add"}
+          </button>
+        </div>
       </div>
 
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 p-5 text-white shadow-md">
@@ -296,41 +416,51 @@ export default function DriverLedgerPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={fieldLabel}>Odometer</label>
-              <input
-                type="number"
-                step="1"
-                min="0"
-                placeholder="miles"
-                value={form.odometer}
-                onChange={(e) => setForm({ ...form, odometer: e.target.value })}
-                className={fieldInput}
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  step="1"
+                  min="0"
+                  placeholder="miles"
+                  value={form.odometer}
+                  onChange={(e) => setForm({ ...form, odometer: e.target.value })}
+                  className={fieldInput + " pr-12"}
+                />
+                <CamBtn loading={ocrLoading === "odometer"} onClick={() => odometerCameraRef.current?.click()} />
+              </div>
             </div>
             <div>
               <label className={fieldLabel}>Gallons</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.0"
-                value={form.gallons}
-                onChange={(e) => setForm({ ...form, gallons: e.target.value })}
-                className={fieldInput}
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.001"
+                  min="0"
+                  placeholder="0.0"
+                  value={form.gallons}
+                  onChange={(e) => setForm({ ...form, gallons: e.target.value })}
+                  className={fieldInput + " pr-12"}
+                />
+                <CamBtn loading={ocrLoading === "pump"} onClick={() => pumpCameraRef.current?.click()} />
+              </div>
             </div>
           </div>
 
           <div>
             <label className={fieldLabel}>Fuel price / gallon</label>
-            <input
-              type="number"
-              step="0.001"
-              min="0"
-              placeholder="0.00"
-              value={form.fuelPrice}
-              onChange={(e) => setForm({ ...form, fuelPrice: e.target.value })}
-              className={fieldInput}
-            />
+            <div className="relative">
+              <input
+                type="number"
+                step="0.001"
+                min="0"
+                placeholder="0.00"
+                value={form.fuelPrice}
+                onChange={(e) => setForm({ ...form, fuelPrice: e.target.value })}
+                className={fieldInput + " pr-12"}
+              />
+              <CamBtn loading={ocrLoading === "pump"} onClick={() => pumpCameraRef.current?.click()} />
+            </div>
+            <p className="text-xs text-slate-400 mt-1">📷 Tap camera icon to scan pump display — fills gallons + price automatically</p>
           </div>
 
           {previewFuelCost != null && (
@@ -381,6 +511,7 @@ export default function DriverLedgerPage() {
               onChange={(e) => setForm({ ...form, cashReceived: e.target.value })}
               className={fieldInput}
             />
+            <p className="text-xs text-slate-400 mt-1">Cash you already received — reduces the settlement owed to you</p>
           </div>
 
           {previewNet != null && (
@@ -442,7 +573,7 @@ export default function DriverLedgerPage() {
             {weeks.map((w) => {
               const isPaid = paidWeeks.has(w.weekStart);
               const weekDeductions = deductionsForWeek(deductions, w.weekStart);
-              const weekSettlement = Math.round(w.gross * (1 - feePercent / 100)) - weekDeductions.total;
+              const weekSettlement = Math.round(w.gross * (1 - feePercent / 100)) - w.cashReceived - weekDeductions.total;
               const weekAfterFuel = w.net - weekDeductions.total;
               return (
                 <div key={w.weekStart} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -450,6 +581,9 @@ export default function DriverLedgerPage() {
                     <div>
                       <p className="font-semibold text-slate-800">{weekRangeLabel(w.weekStart)}</p>
                       <p className="text-xs text-slate-400">Gross {fmt(w.gross)} · {w.hours ? `${w.hours}h` : "—"}</p>
+                      {w.cashReceived > 0 && (
+                        <p className="text-xs text-blue-500 mt-0.5">💵 Cash received {fmt(w.cashReceived)}</p>
+                      )}
                       {weekDeductions.items.length > 0 && (
                         <p className="text-xs text-red-500 mt-0.5">
                           -{fmt(weekDeductions.total)} ({weekDeductions.items.map((d) => d.label).join(", ")})
@@ -495,6 +629,7 @@ export default function DriverLedgerPage() {
                           )}
                         </div>
                         <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-400 mt-1">
+                          {e.odometer != null && <span>🛣 {e.odometer.toLocaleString()} mi</span>}
                           {e.gallons != null && <span>⛽ {e.gallons}gal{e.mpg != null ? ` · ${e.mpg.toFixed(1)} mpg` : ""}</span>}
                           {e.grossCents != null && <span>GROSS {fmt(e.grossCents)}</span>}
                           {e.workingHours != null && (
