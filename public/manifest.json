@@ -2,7 +2,7 @@
   "name": "TruckAudit - Fleet Management",
   "short_name": "TruckAudit",
   "description": "Fleet management for truck drivers and owners",
-  "start_url": "/",
+  "start_url": "/login",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
