@@ -200,12 +200,18 @@ export default function OwnerLedgerPage() {
               }),
               { gross: 0, fuel: 0, cashReceived: 0, repairExpense: 0, hours: 0 }
             );
+            const settlementForWeek = (w: WeekGroup) =>
+              Math.round(w.gross * (1 - driver.ledgerFeePercent / 100)) - w.cashReceived - deductionsForWeek(driverDeductions, w.weekStart).total;
+            const afterFuelForWeek = (w: WeekGroup) => w.net - deductionsForWeek(driverDeductions, w.weekStart).total;
+            const settlementTotal = weeks.reduce((sum, w) => sum + settlementForWeek(w), 0);
+            const afterFuelTotal = weeks.reduce((sum, w) => sum + afterFuelForWeek(w), 0);
             const settlementOwed = weeks
               .filter((w) => !driverPaidWeeks.has(w.weekStart))
-              .reduce((sum, w) => sum + Math.round(w.gross * (1 - driver.ledgerFeePercent / 100)) - w.cashReceived - deductionsForWeek(driverDeductions, w.weekStart).total, 0);
+              .reduce((sum, w) => sum + settlementForWeek(w), 0);
             const afterFuelOwed = weeks
               .filter((w) => !driverPaidWeeks.has(w.weekStart))
-              .reduce((sum, w) => sum + w.net - deductionsForWeek(driverDeductions, w.weekStart).total, 0);
+              .reduce((sum, w) => sum + afterFuelForWeek(w), 0);
+            const paidCount = weeks.filter((w) => driverPaidWeeks.has(w.weekStart)).length;
             const isSelected = selected === driver.id;
             const activeDeductions = driverDeductions.filter((d) => !d.stoppedWeek);
             const stoppedDeductions = driverDeductions.filter((d) => d.stoppedWeek);
@@ -224,11 +230,15 @@ export default function OwnerLedgerPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className="text-xs text-slate-400">Settlement</p>
-                      <p className={`font-bold text-lg ${settlementOwed >= 0 ? "text-green-600" : "text-red-600"}`}>
-                        {fmt(settlementOwed)}
+                      <p className="text-xs text-slate-400">Всего</p>
+                      <p className="font-bold text-lg text-slate-700">{fmt(settlementTotal)}</p>
+                      <p className="text-xs text-slate-400">
+                        к выплате{" "}
+                        <span className={settlementOwed >= 0 ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
+                          {fmt(settlementOwed)}
+                        </span>
                       </p>
-                      <p className="text-xs text-slate-400">after fuel {fmt(afterFuelOwed)}</p>
+                      <p className="text-xs text-slate-400">чистыми {fmt(afterFuelOwed)}</p>
                     </div>
                     <span className="text-slate-400 text-xl">{isSelected ? "▲" : "▼"}</span>
                   </div>
@@ -237,7 +247,7 @@ export default function OwnerLedgerPage() {
                 {isSelected && (
                   <div className="border-t border-slate-100 p-4 bg-slate-50 space-y-3">
                     <p className="text-xs text-slate-400">
-                      Settlement = GROSS × (1 − fee%) − recurring deductions. Matches the AstraGold statement. After fuel = Settlement − fuel paid at pump.
+                      Общий стейтмент {fmt(settlementTotal)} (все {weeks.length} нед) · чистыми всего {fmt(afterFuelTotal)} · к выплате {fmt(settlementOwed)} ({weeks.length - paidCount} нед)
                     </p>
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="bg-white rounded-lg p-2 border border-slate-200">

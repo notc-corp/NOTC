@@ -294,14 +294,19 @@ export default function DriverLedgerPage() {
   // Settlement = gross × (1−fee%) − cash already received − recurring deductions
   const settlementForWeek = (w: WeekGroup) =>
     Math.round(w.gross * (1 - feePercent / 100)) - w.cashReceived - deductionsForWeek(deductions, w.weekStart).total;
-  // After fuel = settlement − fuel paid at pump (driver's own expense)
+  // After fuel = net (already minus fuel) − recurring deductions
   const afterFuelForWeek = (w: WeekGroup) => w.net - deductionsForWeek(deductions, w.weekStart).total;
+  // All-time totals (paid + unpaid)
+  const settlementTotal = weeks.reduce((sum, w) => sum + settlementForWeek(w), 0);
+  const afterFuelTotal = weeks.reduce((sum, w) => sum + afterFuelForWeek(w), 0);
+  // Unpaid only — what's still owed
   const settlementOwed = weeks
     .filter((w) => !paidWeeks.has(w.weekStart))
     .reduce((sum, w) => sum + settlementForWeek(w), 0);
   const afterFuelOwed = weeks
     .filter((w) => !paidWeeks.has(w.weekStart))
     .reduce((sum, w) => sum + afterFuelForWeek(w), 0);
+  const paidCount = weeks.filter((w) => paidWeeks.has(w.weekStart)).length;
 
   const thisWeekStart = weekStartOf(today());
   const lastWeekDate = new Date(thisWeekStart + "T00:00:00");
@@ -377,12 +382,24 @@ export default function DriverLedgerPage() {
 
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 p-5 text-white shadow-md">
         <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10" />
-        <p className="text-amber-100 text-sm font-medium">Settlement owed</p>
-        <p className="text-4xl font-bold tracking-tight mt-1">{fmt(settlementOwed)}</p>
-        <p className="text-amber-100 text-xs mt-2">Matches statement · {feePercent}% fee + deductions</p>
-        <div className="mt-3 pt-3 border-t border-white/20 flex items-baseline justify-between">
-          <p className="text-amber-100 text-sm">After fuel & expenses</p>
-          <p className="text-2xl font-bold">{fmt(afterFuelOwed)}</p>
+        <p className="text-amber-100 text-sm font-medium">Общий стейтмент</p>
+        <p className="text-4xl font-bold tracking-tight mt-1">{fmt(settlementTotal)}</p>
+        <p className="text-amber-100 text-xs mt-1">
+          Все {weeks.length} нед · {feePercent}% fee · чистыми {fmt(afterFuelTotal)}
+        </p>
+        <div className="mt-4 pt-3 border-t border-white/20 grid grid-cols-2 gap-3">
+          <div>
+            <p className="text-amber-200 text-xs uppercase tracking-wide">К выплате</p>
+            <p className="text-2xl font-bold mt-0.5">{fmt(settlementOwed)}</p>
+            <p className="text-amber-300 text-xs">
+              {weeks.length - paidCount} нед не оплачено
+            </p>
+          </div>
+          <div>
+            <p className="text-amber-200 text-xs uppercase tracking-wide">Чистыми</p>
+            <p className="text-2xl font-bold mt-0.5">{fmt(afterFuelOwed)}</p>
+            <p className="text-amber-300 text-xs">после бензина</p>
+          </div>
         </div>
       </div>
 
