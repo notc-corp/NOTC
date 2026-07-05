@@ -36,7 +36,7 @@ export default function OwnerLayout({
       .then((r) => r.json())
       .then((data) => {
         if (!data.user || data.user.role !== "owner") {
-          router.push("/");
+          router.push("/login");
         } else {
           setUser(data.user);
         }
@@ -46,7 +46,7 @@ export default function OwnerLayout({
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
+    router.push("/login");
   };
 
   if (loading) {

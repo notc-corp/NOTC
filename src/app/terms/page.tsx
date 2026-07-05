@@ -7,7 +7,7 @@ export default function TermsPage() {
 
   return (
     <div className="min-h-screen bg-white px-4 py-10 max-w-3xl mx-auto">
-      <Link href="/" className="text-amber-600 text-sm font-medium mb-6 inline-block">← Back to sign in</Link>
+      <Link href="/login" className="text-amber-600 text-sm font-medium mb-6 inline-block">← Back to sign in</Link>
       <h1 className="text-3xl font-bold text-slate-900 mb-2">Terms of Service</h1>
       <p className="text-slate-500 text-sm mb-8">Effective date: {effectiveDate}</p>
 

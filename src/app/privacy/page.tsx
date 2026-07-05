@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Link
-          href="/"
+          href="/login"
           className="text-amber-600 hover:text-amber-700 text-sm font-medium mb-6 inline-block"
         >
           &larr; Back to Login

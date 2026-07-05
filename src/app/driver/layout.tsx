@@ -41,7 +41,7 @@ export default function DriverLayout({
 
   const handleLogout = useCallback(async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
+    router.push("/login");
   }, [router]);
 
   // Schedule auto-logout at midnight
@@ -64,7 +64,7 @@ export default function DriverLayout({
       .then((r) => r.json())
       .then((data) => {
         if (!data.user || data.user.role !== "driver") {
-          router.push("/");
+          router.push("/login");
         } else {
           setUser(data.user);
           checkDowntime();
